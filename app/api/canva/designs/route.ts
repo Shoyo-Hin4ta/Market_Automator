@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { getValidCanvaToken } from '@/lib/canva/token-manager'
-import { CanvaService } from '@/services/canva'
+import { createClient } from '@/app/src/lib/supabase/server'
+import { getValidCanvaToken } from '@/app/src/lib/canva/token-manager'
+import { CanvaService } from '@/app/src/services/canva'
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
@@ -12,6 +12,22 @@ export async function GET(request: NextRequest) {
   }
   
   try {
+    // Check if Canva is connected first
+    const { data: canvaConnection } = await supabase
+      .from('api_keys')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('service', 'canva')
+      .single()
+    
+    if (!canvaConnection) {
+      return NextResponse.json({ 
+        error: 'Canva not connected',
+        connected: false,
+        designs: [] 
+      }, { status: 200 })
+    }
+    
     const token = await getValidCanvaToken(user.id)
     const canva = new CanvaService(token)
     
@@ -23,13 +39,24 @@ export async function GET(request: NextRequest) {
     const response = await canva.listDesigns(50, continuation || undefined)
     
     return NextResponse.json({ 
-      designs: response.items,
+      connected: true,
+      designs: response.items || [],
       continuation: response.continuation 
     })
   } catch (error) {
     console.error('Failed to fetch designs:', error)
+    
+    // If error is about missing connection, return appropriate response
+    if (error instanceof Error && error.message === 'Canva not connected') {
+      return NextResponse.json({ 
+        error: 'Canva not connected',
+        connected: false,
+        designs: [] 
+      }, { status: 200 })
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to fetch designs' }, 
+      { error: 'Failed to fetch designs', connected: false }, 
       { status: 500 }
     )
   }

@@ -5,9 +5,11 @@ A comprehensive marketing automation platform that integrates Canva, Notion, Git
 ## Features
 
 - **Multi-Service Integration**: Connect Canva, Notion, GitHub, Mailchimp, and OpenAI in one platform
+- **Smart Design Management**: Browse and organize Canva designs with dimension-based grouping
 - **Automated Campaign Creation**: Generate marketing campaigns from Canva designs
 - **AI-Powered Content**: Use OpenAI to generate optimized email and landing page content
 - **Multi-Channel Distribution**: Distribute campaigns to email, Notion databases, and GitHub Pages
+- **Advanced Filtering**: Category filters for Social Media, Presentations, Videos, and more
 - **Secure Authentication**: Built on Supabase with row-level security
 - **Modern UI**: Clean, responsive interface built with Next.js and Shadcn UI
 
@@ -61,7 +63,11 @@ A comprehensive marketing automation platform that integrates Canva, Notion, Git
    - Mailchimp: Add API key and server prefix
    - OpenAI: Add your API key
    - Canva: Connect via OAuth
-3. **Create Campaigns**: Select Canva designs from the dashboard and distribute to multiple channels
+3. **Browse Designs**: Navigate to the Dashboard to view your Canva designs:
+   - Designs are automatically grouped by dimensions (Square, Portrait, Landscape, etc.)
+   - Use category filters to find specific design types
+   - Search by design name or switch between grid/list views
+4. **Create Campaigns**: Select any design and click "Distribute Campaign" to start the campaign creation flow
 
 ## Project Structure
 
@@ -69,10 +75,15 @@ A comprehensive marketing automation platform that integrates Canva, Notion, Git
 /app              # Next.js App Router pages
 /app/src          # Source code
   /components     # UI components
+    /dashboard    # Dashboard-specific components
+    /settings     # Settings page components
   /contexts       # React contexts
   /hooks          # Custom hooks
   /lib            # Utilities and configs
+    /constants    # App constants and categories
+    /utils        # Helper functions
   /services       # API service layers
+  /types          # TypeScript type definitions
 /supabase         # Database migrations
 /components       # Shadcn UI components
 ```

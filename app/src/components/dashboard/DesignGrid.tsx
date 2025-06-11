@@ -1,5 +1,5 @@
 import { DesignCard } from './DesignCard'
-import { CanvaDesign } from '@/types/canva'
+import { CanvaDesign } from '@/app/src/types/canva'
 
 interface DesignGridProps {
   designs: CanvaDesign[]
@@ -18,7 +18,7 @@ export function DesignGrid({ designs, viewMode }: DesignGridProps) {
   return (
     <div className={
       viewMode === 'grid'
-        ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+        ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-min'
         : 'space-y-4'
     }>
       {designs.map((design) => (

@@ -7,8 +7,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { CanvaDesign } from '@/types/canva'
-import { useToast } from '@/hooks/use-toast'
+import { CanvaDesign } from '@/app/src/types/canva'
+import { useToast } from '@/app/src/hooks/use-toast'
 import { useRouter } from 'next/navigation'
 
 interface DistributeDialogProps {

@@ -1,40 +1,88 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DesignGrid } from '@/components/dashboard/DesignGrid'
-import { DesignFilters } from '@/components/dashboard/DesignFilters'
-import { useCanvaDesigns } from '@/hooks/useCanvaDesigns'
+import { DesignGrid } from '@/app/src/components/dashboard/DesignGrid'
+import { GroupedDesignGrid } from '@/app/src/components/dashboard/GroupedDesignGrid'
+import { DesignFilters } from '@/app/src/components/dashboard/DesignFilters'
+import { useCanvaDesigns } from '@/app/src/hooks/useCanvaDesigns'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { DesignCategory } from '@/app/src/types/canva'
+import { detectDesignCategory } from '@/app/src/lib/constants/design-categories'
 
 export default function DashboardPage() {
-  const { designs, loading, error, refetch } = useCanvaDesigns()
+  const { designs, loading, error, connected, refetch } = useCanvaDesigns()
   const [filteredDesigns, setFilteredDesigns] = useState(designs)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [selectedCategory, setSelectedCategory] = useState<DesignCategory>('all')
+  const [searchQuery, setSearchQuery] = useState('')
   
   useEffect(() => {
-    setFilteredDesigns(designs)
-  }, [designs])
+    applyFilters(designs, searchQuery, selectedCategory)
+  }, [designs, selectedCategory])
+  
+  const applyFilters = (designList: typeof designs, search: string, category: DesignCategory) => {
+    let filtered = [...designList]
+    
+    // Apply search filter
+    if (search) {
+      filtered = filtered.filter(design =>
+        design?.title?.toLowerCase().includes(search.toLowerCase())
+      )
+    }
+    
+    // Apply category filter
+    if (category !== 'all') {
+      filtered = filtered.filter(design => {
+        const detectedCategory = detectDesignCategory(design?.title || '')
+        return detectedCategory === category || (detectedCategory === 'all' && category === 'all')
+      })
+    }
+    
+    setFilteredDesigns(filtered)
+  }
   
   const handleSearch = (query: string) => {
-    const filtered = designs.filter(design =>
-      design.title.toLowerCase().includes(query.toLowerCase())
-    )
-    setFilteredDesigns(filtered)
+    setSearchQuery(query)
+    applyFilters(designs, query, selectedCategory)
+  }
+  
+  const handleCategoryChange = (category: DesignCategory) => {
+    setSelectedCategory(category)
   }
   
   const handleSort = (sortBy: 'name' | 'date') => {
     const sorted = [...filteredDesigns].sort((a, b) => {
       if (sortBy === 'name') {
-        return a.title.localeCompare(b.title)
+        return (a?.title || '').localeCompare(b?.title || '')
       }
-      return b.updated_at - a.updated_at
+      return (b?.updated_at || 0) - (a?.updated_at || 0)
     })
     setFilteredDesigns(sorted)
   }
   
-  if (error) {
+  // Handle Canva not connected
+  if (!loading && !connected) {
+    return (
+      <div className="text-center py-12 space-y-4">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold">Connect Your Canva Account</h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            To view and distribute your designs, you need to connect your Canva account first.
+          </p>
+        </div>
+        <Button 
+          onClick={() => window.location.href = '/settings?tab=canva'}
+          size="lg"
+        >
+          Connect Canva Account
+        </Button>
+      </div>
+    )
+  }
+  
+  if (error && connected) {
     return (
       <div className="text-center py-12">
         <p className="text-destructive mb-4">Failed to load designs</p>
@@ -52,7 +100,9 @@ export default function DashboardPage() {
             Select a design to create a marketing campaign
           </p>
         </div>
-        <Button>
+        <Button
+          onClick={() => window.open('https://www.canva.com/', '_blank')}
+        >
           <Plus className="w-4 h-4 mr-2" />
           Create in Canva
         </Button>
@@ -63,12 +113,14 @@ export default function DashboardPage() {
         onSort={handleSort}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        selectedCategory={selectedCategory}
+        onCategoryChange={handleCategoryChange}
       />
       
       {loading ? (
         <DesignGridSkeleton />
       ) : (
-        <DesignGrid
+        <GroupedDesignGrid
           designs={filteredDesigns}
           viewMode={viewMode}
         />

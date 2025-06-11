@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { CanvaDesign } from '@/types/canva'
+import { CanvaDesign } from '@/app/src/types/canva'
 
 interface DesignCardProps {
   design: CanvaDesign
@@ -20,6 +20,11 @@ interface DesignCardProps {
 export function DesignCard({ design, viewMode }: DesignCardProps) {
   const [showDistribute, setShowDistribute] = useState(false)
   
+  // Safety check for missing data
+  if (!design || !design.thumbnail?.url) {
+    return null
+  }
+  
   if (viewMode === 'list') {
     return (
       <Card>
@@ -27,11 +32,11 @@ export function DesignCard({ design, viewMode }: DesignCardProps) {
           <div className="flex items-center gap-4">
             <img
               src={design.thumbnail.url}
-              alt={design.title}
+              alt={design.title || 'Untitled'}
               className="w-16 h-16 object-cover rounded"
             />
             <div>
-              <h3 className="font-medium">{design.title}</h3>
+              <h3 className="font-medium">{design.title || 'Untitled'}</h3>
               <p className="text-sm text-muted-foreground">
                 Updated {formatDistanceToNow(new Date(design.updated_at * 1000))} ago
               </p>
@@ -53,7 +58,10 @@ export function DesignCard({ design, viewMode }: DesignCardProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => window.open(design.urls.view_url, '_blank')}>
+                <DropdownMenuItem 
+                  onClick={() => design.urls?.view_url && window.open(design.urls.view_url, '_blank')}
+                  disabled={!design.urls?.view_url}
+                >
                   <Eye className="w-4 h-4 mr-2" />
                   View in Canva
                 </DropdownMenuItem>
@@ -65,14 +73,19 @@ export function DesignCard({ design, viewMode }: DesignCardProps) {
     )
   }
   
+  // Calculate aspect ratio style
+  const aspectRatio = design.thumbnail?.width && design.thumbnail?.height
+    ? design.thumbnail.width / design.thumbnail.height
+    : 1
+
   return (
     <>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-        <div className="aspect-square relative group">
+        <div className="relative group" style={{ aspectRatio }}>
           <img
             src={design.thumbnail.url}
-            alt={design.title}
-            className="w-full h-full object-cover"
+            alt={design.title || 'Untitled'}
+            className="w-full h-full object-contain bg-gray-50"
           />
           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
             <Button
@@ -85,7 +98,7 @@ export function DesignCard({ design, viewMode }: DesignCardProps) {
           </div>
         </div>
         <CardContent className="p-4">
-          <h3 className="font-medium truncate">{design.title}</h3>
+          <h3 className="font-medium truncate">{design.title || 'Untitled'}</h3>
           <p className="text-sm text-muted-foreground">
             {formatDistanceToNow(new Date(design.updated_at * 1000))} ago
           </p>
