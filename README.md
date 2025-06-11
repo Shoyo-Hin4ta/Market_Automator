@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Marketing Automator
+
+A comprehensive marketing automation platform that integrates Canva, Notion, GitHub, Mailchimp, and OpenAI to streamline campaign creation and distribution.
+
+## Features
+
+- **Multi-Service Integration**: Connect Canva, Notion, GitHub, Mailchimp, and OpenAI in one platform
+- **Automated Campaign Creation**: Generate marketing campaigns from Canva designs
+- **AI-Powered Content**: Use OpenAI to generate optimized email and landing page content
+- **Multi-Channel Distribution**: Distribute campaigns to email, Notion databases, and GitHub Pages
+- **Secure Authentication**: Built on Supabase with row-level security
+- **Modern UI**: Clean, responsive interface built with Next.js and Shadcn UI
+
+## Tech Stack
+
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
+- **UI Components**: Shadcn UI
+- **Backend**: Supabase (Auth & Database)
+- **AI**: OpenAI GPT-4 via Vercel AI SDK
+- **Integrations**: Canva OAuth 2.0, Notion API, GitHub API, Mailchimp API v3
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install --legacy-peer-deps
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+3. Set up environment variables in `.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+   
+   NEXT_PUBLIC_CANVA_CLIENT_ID=your-canva-client-id
+   CANVA_CLIENT_SECRET=your-canva-secret
+   CANVA_REDIRECT_URI=http://127.0.0.1:3000/api/auth/callback/canva
+   
+   NEXT_PUBLIC_APP_URL=http://127.0.0.1:3000
+   ```
+
+4. Run database migrations:
+   ```bash
+   npx supabase db push
+   ```
+
+5. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+6. Open [http://127.0.0.1:3000](http://127.0.0.1:3000) (use 127.0.0.1, not localhost)
+
+## Usage
+
+1. **Register/Login**: Create an account or sign in
+2. **Connect Services**: Go to Settings and connect your integrations:
+   - Notion: Add your Integration Token
+   - GitHub: Add username and Personal Access Token
+   - Mailchimp: Add API key and server prefix
+   - OpenAI: Add your API key
+   - Canva: Connect via OAuth
+3. **Create Campaigns**: Select Canva designs from the dashboard and distribute to multiple channels
+
+## Project Structure
+
+```
+/app              # Next.js App Router pages
+/app/src          # Source code
+  /components     # UI components
+  /contexts       # React contexts
+  /hooks          # Custom hooks
+  /lib            # Utilities and configs
+  /services       # API service layers
+/supabase         # Database migrations
+/components       # Shadcn UI components
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Security
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- All API keys are stored securely in Supabase
+- Row Level Security (RLS) enabled on all tables
+- OAuth 2.0 with PKCE for Canva integration
+- Server-side only API calls
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## License
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
