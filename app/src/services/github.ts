@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest'
 
 export class GitHubService {
-  private octokit: Octokit | null = null
+  public octokit: Octokit | null = null
   
   constructor(pat?: string) {
     if (pat) {
@@ -88,6 +88,32 @@ export class GitHubService {
       return data
     } catch (error) {
       console.error('Failed to create landing page:', error)
+      throw error
+    }
+  }
+  
+  async enableGitHubPages(owner: string, repo: string) {
+    if (!this.octokit) return null
+    
+    try {
+      // Enable GitHub Pages with main branch as source
+      const { data } = await this.octokit.repos.createPagesSite({
+        owner,
+        repo,
+        source: {
+          branch: 'main',
+          path: '/'
+        }
+      })
+      
+      return data
+    } catch (error: any) {
+      // If Pages is already enabled, that's fine
+      if (error.status === 409) {
+        console.log('GitHub Pages already enabled')
+        return { html_url: `https://${owner}.github.io/${repo}/` }
+      }
+      console.error('Failed to enable GitHub Pages:', error)
       throw error
     }
   }

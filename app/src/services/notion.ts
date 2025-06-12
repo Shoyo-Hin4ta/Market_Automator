@@ -141,4 +141,66 @@ export class NotionService {
       return []
     }
   }
+  
+  async updateDatabaseEntry(pageId: string, properties: Record<string, any>): Promise<void> {
+    if (!this.client) throw new Error('Notion client not initialized')
+    
+    try {
+      await this.client.pages.update({
+        page_id: pageId,
+        properties
+      })
+    } catch (error) {
+      console.error('Failed to update database entry:', error)
+      throw error
+    }
+  }
+  
+  async createCampaignPage(databaseId: string, campaignData: {
+    name: string
+    design_url: string
+    status: string
+    created_date: string
+    github_url?: string
+  }): Promise<{ id: string; url: string }> {
+    if (!this.client) throw new Error('Notion client not initialized')
+    
+    try {
+      const properties: any = {
+        'Campaign Name': { 
+          title: [{ 
+            type: 'text', 
+            text: { content: campaignData.name } 
+          }] 
+        },
+        'Design URL': { 
+          url: campaignData.design_url 
+        },
+        'Created Date': { 
+          date: { start: campaignData.created_date } 
+        },
+        'Status': { 
+          select: { name: campaignData.status } 
+        }
+      }
+      
+      // Add GitHub URL if provided
+      if (campaignData.github_url) {
+        properties['GitHub URL'] = { url: campaignData.github_url }
+      }
+      
+      const page = await this.client.pages.create({
+        parent: { database_id: databaseId },
+        properties
+      })
+      
+      return {
+        id: page.id,
+        url: (page as any).url || `https://www.notion.so/${page.id.replace(/-/g, '')}`
+      }
+    } catch (error) {
+      console.error('Failed to create campaign page:', error)
+      throw error
+    }
+  }
 }

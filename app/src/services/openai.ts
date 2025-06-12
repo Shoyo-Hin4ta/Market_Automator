@@ -1,11 +1,16 @@
-import { openai } from '@ai-sdk/openai'
+import { createOpenAI } from '@ai-sdk/openai'
 import { generateText } from 'ai'
 
 export class OpenAIService {
   private apiKey: string
+  private openai: ReturnType<typeof createOpenAI>
   
   constructor(apiKey?: string) {
     this.apiKey = apiKey || ''
+    // Create a custom OpenAI instance with the provided API key
+    this.openai = createOpenAI({
+      apiKey: this.apiKey,
+    })
   }
   
   async testConnection(): Promise<boolean> {
@@ -28,8 +33,10 @@ export class OpenAIService {
   
   async generateEmailContent(prompt: string) {
     const { text } = await generateText({
-      model: openai('gpt-4-turbo', { apiKey: this.apiKey }),
+      model: this.openai('gpt-4o-mini'),
       prompt,
+      temperature: 0.7,
+      maxTokens: 2000,
     })
     return text
   }
@@ -51,8 +58,10 @@ export class OpenAIService {
     5. A brief footer text`
     
     const { text } = await generateText({
-      model: openai('gpt-4-turbo', { apiKey: this.apiKey }),
+      model: this.openai('gpt-4o-mini'),
       prompt,
+      temperature: 0.7,
+      maxTokens: 1500,
     })
     
     return text

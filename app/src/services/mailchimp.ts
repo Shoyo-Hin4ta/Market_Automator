@@ -60,17 +60,90 @@ export class MailchimpService {
       }
     })
     
-    if (!response.ok) throw new Error('Failed to fetch analytics')
+    if (!response.ok) {
+      const error = await response.text()
+      console.error('Mailchimp analytics error:', error)
+      // Return zero analytics if campaign hasn't been sent yet
+      if (response.status === 404) {
+        return {
+          emails_sent: 0,
+          emails_opened: 0,
+          emails_clicked: 0,
+          bounce_rate: 0,
+          open_rate: 0,
+          click_rate: 0,
+          unsubscribes: 0
+        }
+      }
+      throw new Error(`Failed to fetch analytics: ${error}`)
+    }
     
     const data = await response.json()
     return {
-      emails_sent: data.emails_sent,
-      emails_opened: data.opens.unique_opens,
-      emails_clicked: data.clicks.unique_clicks,
-      bounce_rate: data.bounces.hard_bounces + data.bounces.soft_bounces,
-      open_rate: data.opens.open_rate * 100,
-      click_rate: data.clicks.click_rate * 100,
-      unsubscribes: data.unsubscribed
+      emails_sent: data.emails_sent || 0,
+      emails_opened: data.opens?.unique_opens || 0,
+      emails_clicked: data.clicks?.unique_clicks || 0,
+      bounce_rate: (data.bounces?.hard_bounces || 0) + (data.bounces?.soft_bounces || 0),
+      open_rate: (data.opens?.open_rate || 0) * 100,
+      click_rate: (data.clicks?.click_rate || 0) * 100,
+      unsubscribes: data.unsubscribed || 0
+    }
+  }
+  
+  async sendCampaign(campaignId: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/campaigns/${campaignId}/actions/send`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`
+      }
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`Failed to send campaign: ${error}`)
+    }
+  }
+  
+  async createCampaign(data: {
+    type: string
+    recipients: { list_id: string }
+    settings: {
+      subject_line: string
+      from_name: string
+      reply_to: string
+      title: string
+    }
+  }): Promise<{ id: string }> {
+    const response = await fetch(`${this.baseUrl}/campaigns`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`Failed to create campaign: ${error}`)
+    }
+    
+    return response.json()
+  }
+  
+  async setContent(campaignId: string, content: { html: string }): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/campaigns/${campaignId}/content`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(content)
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`Failed to set campaign content: ${error}`)
     }
   }
 }

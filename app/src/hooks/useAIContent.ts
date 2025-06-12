@@ -1,10 +1,9 @@
 import { useState } from 'react'
 
 interface CampaignData {
-  title: string
-  description: string
-  audience?: string
-  imageUrl?: string
+  campaignName: string
+  designUrl?: string
+  tone?: string
 }
 
 export function useAIContent() {
@@ -22,12 +21,13 @@ export function useAIContent() {
         body: JSON.stringify(campaignData)
       })
       
+      const data = await response.json()
+      
       if (!response.ok) {
-        throw new Error('Failed to generate email content')
+        throw new Error(data.error || 'Failed to generate email content')
       }
       
-      const { content } = await response.json()
-      return content
+      return data
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
       throw err
@@ -47,12 +47,13 @@ export function useAIContent() {
         body: JSON.stringify(campaignData)
       })
       
+      const data = await response.json()
+      
       if (!response.ok) {
-        throw new Error('Failed to generate landing page content')
+        throw new Error(data.error || 'Failed to generate landing page content')
       }
       
-      const { content } = await response.json()
-      return content
+      return data
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
       throw err
