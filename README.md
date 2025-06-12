@@ -6,9 +6,10 @@ A comprehensive marketing automation platform that integrates Canva, Notion, Git
 
 - **Multi-Service Integration**: Connect Canva, Notion, GitHub, Mailchimp, and OpenAI in one platform
 - **Smart Design Management**: Browse and organize Canva designs with dimension-based grouping
-- **Automated Campaign Creation**: Generate marketing campaigns from Canva designs
+- **Automated Campaign Creation**: Generate marketing campaigns from Canva designs with AI
 - **AI-Powered Content**: Use OpenAI to generate optimized email and landing page content
 - **Multi-Channel Distribution**: Distribute campaigns to email, Notion databases, and GitHub Pages
+- **Campaign Analytics**: Track email performance with detailed metrics and real-time sync
 - **Advanced Filtering**: Category filters for Social Media, Presentations, Videos, and more
 - **Secure Authentication**: Built on Supabase with row-level security
 - **Modern UI**: Clean, responsive interface built with Next.js and Shadcn UI
@@ -67,7 +68,15 @@ A comprehensive marketing automation platform that integrates Canva, Notion, Git
    - Designs are automatically grouped by dimensions (Square, Portrait, Landscape, etc.)
    - Use category filters to find specific design types
    - Search by design name or switch between grid/list views
-4. **Create Campaigns**: Select any design and click "Distribute Campaign" to start the campaign creation flow
+4. **Create Campaigns**: Select any design and click "Distribute Campaign":
+   - Choose distribution channels (Email, Notion, GitHub)
+   - AI generates optimized content for each channel
+   - Campaigns are created across all selected services
+5. **Track Performance**: Monitor campaigns in the Analytics page:
+   - View all campaigns with status and channel badges
+   - Send emails directly from the platform
+   - Sync real-time analytics from Mailchimp
+   - See detailed metrics including open rates, click rates, and more
 
 ## Project Structure
 
@@ -77,15 +86,19 @@ A comprehensive marketing automation platform that integrates Canva, Notion, Git
   /components     # UI components
     /dashboard    # Dashboard-specific components
     /settings     # Settings page components
+    /campaigns    # Campaign analytics components
   /contexts       # React contexts
   /hooks          # Custom hooks
   /lib            # Utilities and configs
     /constants    # App constants and categories
     /utils        # Helper functions
+    /ai           # AI prompt templates
+    /canva        # Canva OAuth config
   /services       # API service layers
   /types          # TypeScript type definitions
 /supabase         # Database migrations
 /components       # Shadcn UI components
+/api              # API routes for integrations
 ```
 
 ## Security

@@ -11,7 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatDistanceToNow } from 'date-fns'
-import { Mail, BarChart3, Send, RefreshCw } from 'lucide-react'
+import { Mail, BarChart3, Send } from 'lucide-react'
 import { Campaign } from '@/app/src/types/campaign'
 import { useState } from 'react'
 import { useToast } from '@/app/src//hooks/use-toast'
@@ -62,31 +62,50 @@ export function CampaignTable({ campaigns, loading }: CampaignTableProps) {
     }
   }
   
-  const handleSyncAnalytics = async (campaign: Campaign) => {
-    try {
-      const response = await fetch(`/api/campaigns/${campaign.id}/sync-analytics`, {
-        method: 'POST'
-      })
-      
-      if (!response.ok) throw new Error('Failed to sync analytics')
-      
-      toast({
-        title: 'Analytics synced',
-        description: 'Latest analytics data has been fetched'
-      })
-      
-      window.location.reload()
-    } catch (error) {
-      toast({
-        title: 'Sync failed',
-        description: error instanceof Error ? error.message : 'Failed to sync analytics',
-        variant: 'destructive'
-      })
-    }
-  }
   
   if (loading) {
-    return <div className="text-center py-8">Loading campaigns...</div>
+    return (
+      <div className="w-full">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Campaign Name</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Channels</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[...Array(5)].map((_, i) => (
+              <TableRow key={i}>
+                <TableCell>
+                  <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                </TableCell>
+                <TableCell>
+                  <div className="h-6 w-16 bg-muted animate-pulse rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    <div className="h-5 w-12 bg-muted animate-pulse rounded" />
+                    <div className="h-5 w-12 bg-muted animate-pulse rounded" />
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex gap-2 justify-end">
+                    <div className="h-8 w-20 bg-muted animate-pulse rounded" />
+                    <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    )
   }
   
   if (campaigns.length === 0) {
@@ -154,16 +173,6 @@ export function CampaignTable({ campaigns, loading }: CampaignTableProps) {
                   >
                     <Send className="w-4 h-4 mr-1" />
                     {sendingEmail === campaign.id ? 'Sending...' : 'Send Email'}
-                  </Button>
-                )}
-                
-                {campaign.status === 'sent' && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleSyncAnalytics(campaign)}
-                  >
-                    <RefreshCw className="w-4 h-4" />
                   </Button>
                 )}
               </div>

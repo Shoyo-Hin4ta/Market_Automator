@@ -7,31 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       api_keys: {
@@ -66,44 +41,65 @@ export type Database = {
       }
       campaign_analytics: {
         Row: {
+          abuse_reports: number | null
           bounce_rate: number | null
           campaign_id: string | null
           click_rate: number | null
           created_at: string | null
+          deliveries: number | null
           emails_clicked: number | null
           emails_opened: number | null
           emails_sent: number | null
+          forwards_count: number | null
           id: string
+          last_click: string | null
+          last_open: string | null
           last_synced_at: string | null
           open_rate: number | null
+          total_clicks: number | null
+          total_opens: number | null
           unsubscribes: number | null
           updated_at: string | null
         }
         Insert: {
+          abuse_reports?: number | null
           bounce_rate?: number | null
           campaign_id?: string | null
           click_rate?: number | null
           created_at?: string | null
+          deliveries?: number | null
           emails_clicked?: number | null
           emails_opened?: number | null
           emails_sent?: number | null
+          forwards_count?: number | null
           id?: string
+          last_click?: string | null
+          last_open?: string | null
           last_synced_at?: string | null
           open_rate?: number | null
+          total_clicks?: number | null
+          total_opens?: number | null
           unsubscribes?: number | null
           updated_at?: string | null
         }
         Update: {
+          abuse_reports?: number | null
           bounce_rate?: number | null
           campaign_id?: string | null
           click_rate?: number | null
           created_at?: string | null
+          deliveries?: number | null
           emails_clicked?: number | null
           emails_opened?: number | null
           emails_sent?: number | null
+          forwards_count?: number | null
           id?: string
+          last_click?: string | null
+          last_open?: string | null
           last_synced_at?: string | null
           open_rate?: number | null
+          total_clicks?: number | null
+          total_opens?: number | null
           unsubscribes?: number | null
           updated_at?: string | null
         }
@@ -127,6 +123,7 @@ export type Database = {
           github_page_url: string | null
           id: string
           mailchimp_campaign_id: string | null
+          metadata: Json | null
           name: string
           notion_page_id: string | null
           status: string | null
@@ -142,6 +139,7 @@ export type Database = {
           github_page_url?: string | null
           id?: string
           mailchimp_campaign_id?: string | null
+          metadata?: Json | null
           name: string
           notion_page_id?: string | null
           status?: string | null
@@ -157,6 +155,7 @@ export type Database = {
           github_page_url?: string | null
           id?: string
           mailchimp_campaign_id?: string | null
+          metadata?: Json | null
           name?: string
           notion_page_id?: string | null
           status?: string | null
@@ -194,7 +193,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      decrypt_api_key: {
+        Args: { encrypted_text: string }
+        Returns: string
+      }
+      encrypt_api_key: {
+        Args: { key_text: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
@@ -311,9 +317,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

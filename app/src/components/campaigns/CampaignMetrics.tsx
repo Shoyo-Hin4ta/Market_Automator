@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import { cn } from '@/lib/utils'
 
 interface CampaignMetricsProps {
   analytics: {
@@ -12,11 +13,12 @@ interface CampaignMetricsProps {
     unsubscribes: number
     last_synced_at: string
   }
+  className?: string
 }
 
-export function CampaignMetrics({ analytics }: CampaignMetricsProps) {
+export function CampaignMetrics({ analytics, className }: CampaignMetricsProps) {
   return (
-    <Card className="md:col-span-2 lg:col-span-3">
+    <Card className={cn("md:col-span-2 lg:col-span-3", className)}>
       <CardHeader>
         <CardTitle className="text-lg">Email Campaign Analytics</CardTitle>
         <p className="text-sm text-muted-foreground">
