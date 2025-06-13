@@ -2,17 +2,31 @@
 
 A comprehensive marketing automation platform that integrates Canva, Notion, GitHub, Mailchimp, and OpenAI to streamline campaign creation and distribution.
 
+## 🎨 Latest Updates
+
+### AI-Powered Campaign Customization
+- **Interactive Color Palettes**: Describe your brand colors in natural language and get 4 AI-generated palette options
+- **Conversational Content Generation**: Chat with AI to refine your campaign content in real-time
+- **Template Selection**: Choose between standard landing pages or immersive scrollytelling experiences
+- **Form-First Approach**: Structured campaign setup with intelligent AI assistance
+
+### Enhanced Navigation & UX
+- **Improved Navigation**: Seamless flow between Dashboard, Campaigns, and Settings
+- **GitHub Integration**: Automatic GitHub Pages deployment with clear status indicators
+- **Notion Sync**: Campaign data automatically syncs to your Notion database including GitHub URLs
+
 ## Features
 
 - **Multi-Service Integration**: Connect Canva, Notion, GitHub, Mailchimp, and OpenAI in one platform
 - **Smart Design Management**: Browse and organize Canva designs with dimension-based grouping
 - **Automated Campaign Creation**: Generate marketing campaigns from Canva designs with AI
-- **AI-Powered Content**: Use OpenAI to generate optimized email and landing page content
+- **AI-Powered Content**: Use OpenAI to generate optimized email and landing page content with interactive refinement
 - **Multi-Channel Distribution**: Distribute campaigns to email, Notion databases, and GitHub Pages
 - **Campaign Analytics**: Track email performance with detailed metrics and real-time sync
 - **Advanced Filtering**: Category filters for Social Media, Presentations, Videos, and more
 - **Secure Authentication**: Built on Supabase with row-level security
 - **Modern UI**: Clean, responsive interface built with Next.js and Shadcn UI
+- **Scrollytelling Landing Pages**: Create immersive, animated landing pages with GSAP animations
 
 ## Tech Stack
 
@@ -69,14 +83,17 @@ A comprehensive marketing automation platform that integrates Canva, Notion, Git
    - Use category filters to find specific design types
    - Search by design name or switch between grid/list views
 4. **Create Campaigns**: Select any design and click "Distribute Campaign":
-   - Choose distribution channels (Email, Notion, GitHub)
-   - AI generates optimized content for each channel
-   - Campaigns are created across all selected services
+   - Fill out campaign details (product, audience, purpose)
+   - Choose between standard or scrollytelling landing page templates
+   - Describe your color preferences and select from AI-generated palettes
+   - Chat with AI to refine your content until perfect
+   - Select distribution channels (Email, Notion, GitHub)
 5. **Track Performance**: Monitor campaigns in the Analytics page:
    - View all campaigns with status and channel badges
    - Send emails directly from the platform
    - Sync real-time analytics from Mailchimp
    - See detailed metrics including open rates, click rates, and more
+   - Navigate easily between Dashboard, Campaigns, and Campaign Details
 
 ## Project Structure
 

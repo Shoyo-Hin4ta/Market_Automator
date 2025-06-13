@@ -4,21 +4,25 @@ import { useEffect, useState, use } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ExternalLink, Mail, FileText, Github, AlertCircle, RefreshCw, Users, Clock } from 'lucide-react'
+import { ExternalLink, Mail, FileText, Github, AlertCircle, RefreshCw, Users, Clock, CheckCircle2, ArrowLeft } from 'lucide-react'
 import { CampaignMetrics } from '@/app/src/components/campaigns/CampaignMetrics'
 import { EnhancedCampaignMetrics } from '@/app/src/components/campaigns/EnhancedCampaignMetrics'
 import { GitHubPagesInfo } from '@/app/src/components/campaigns/GitHubPagesInfo'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useToast } from '@/app/src/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useRouter } from 'next/navigation'
 
 export default function CampaignDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
+  const router = useRouter()
   const [campaign, setCampaign] = useState<any>(null)
   const [analytics, setAnalytics] = useState<any>(null)
   const [mailchimpDetails, setMailchimpDetails] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
   const { toast } = useToast()
   
   useEffect(() => {
@@ -92,6 +96,43 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
       })
     } finally {
       setSyncing(false)
+    }
+  }
+  
+  const handleSendEmail = async () => {
+    setSending(true)
+    try {
+      const response = await fetch(`/api/campaigns/${id}/send-email`, {
+        method: 'POST'
+      })
+      
+      if (!response.ok) {
+        const error = await response.text()
+        throw new Error(error)
+      }
+      
+      const data = await response.json()
+      
+      toast({
+        title: '✉️ Email sent successfully!',
+        description: 'Your campaign has been sent to all recipients'
+      })
+      
+      // Show success animation
+      setShowSuccess(true)
+      setTimeout(() => setShowSuccess(false), 3000)
+      
+      // Refresh campaign data to update status
+      await fetchCampaignDetails()
+    } catch (error) {
+      console.error('Send error:', error)
+      toast({
+        title: 'Failed to send email',
+        description: error instanceof Error ? error.message : 'Please try again',
+        variant: 'destructive'
+      })
+    } finally {
+      setSending(false)
     }
   }
   
@@ -199,18 +240,45 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
               Created {new Date(campaign.created_at).toLocaleDateString()}
             </p>
           </div>
-          {campaign.status === 'sent' && (
+          <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={handleSyncAnalytics}
-              disabled={syncing}
+              onClick={() => router.push('/campaigns')}
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
-              {syncing ? 'Syncing...' : 'Sync Analytics'}
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              View All Campaigns
             </Button>
-          )}
+            {campaign.status === 'distributed' && campaign.distributed_channels.includes('email') && (
+              <Button
+                onClick={handleSendEmail}
+                disabled={sending}
+              >
+                <Mail className={`w-4 h-4 mr-2 ${sending ? 'animate-pulse' : ''}`} />
+                {sending ? 'Sending...' : 'Send Email'}
+              </Button>
+            )}
+            {campaign.status === 'sent' && (
+              <Button
+                variant="outline"
+                onClick={handleSyncAnalytics}
+                disabled={syncing}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
+                {syncing ? 'Syncing...' : 'Sync Analytics'}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
+      
+      {showSuccess && (
+        <Alert className="mb-6 border-green-200 bg-green-50">
+          <CheckCircle2 className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            <strong>Campaign sent successfully!</strong> Your email is being delivered to all recipients.
+          </AlertDescription>
+        </Alert>
+      )}
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
@@ -249,7 +317,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
               </div>
             )}
             
-            {campaign.notion_page_id && (
+            {campaign.distributed_channels.includes('notion') && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4" />
@@ -283,7 +351,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
               </div>
             )}
             
-            {campaign.github_page_url && (
+            {campaign.distributed_channels.includes('github') && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
