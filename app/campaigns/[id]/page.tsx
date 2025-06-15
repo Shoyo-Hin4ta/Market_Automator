@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ExternalLink, Mail, FileText, Github, AlertCircle, RefreshCw, Users, Clock, CheckCircle2, ArrowLeft } from 'lucide-react'
-import { CampaignMetrics } from '@/app/src/components/campaigns/CampaignMetrics'
-import { EnhancedCampaignMetrics } from '@/app/src/components/campaigns/EnhancedCampaignMetrics'
-import { GitHubPagesInfo } from '@/app/src/components/campaigns/GitHubPagesInfo'
+import { CampaignMetrics } from '@/app/components/campaigns/CampaignMetrics'
+import { EnhancedCampaignMetrics } from '@/app/components/campaigns/EnhancedCampaignMetrics'
+import { GitHubPagesInfo } from '@/app/components/campaigns/GitHubPagesInfo'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { useToast } from '@/app/src/hooks/use-toast'
+import { useToast } from '@/app/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRouter } from 'next/navigation'
 
@@ -228,15 +228,15 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
     )
   }
   
-  if (!campaign) return <div className="container mx-auto py-8">Campaign not found</div>
+  if (!campaign) return <div className="container mx-auto py-8 text-white">Campaign not found</div>
   
   return (
     <div className="container mx-auto py-8">
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">{campaign.name}</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl font-bold text-yellow-300">{campaign.name}</h1>
+            <p className="text-amber-300">
               Created {new Date(campaign.created_at).toLocaleDateString()}
             </p>
           </div>
@@ -244,6 +244,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
             <Button
               variant="outline"
               onClick={() => router.push('/campaigns')}
+              className="btn-magical bg-transparent border border-yellow-400 text-yellow-400 hover:bg-yellow-400/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               View All Campaigns
@@ -252,6 +253,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
               <Button
                 onClick={handleSendEmail}
                 disabled={sending}
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-0 shadow-md hover:shadow-lg transition-all font-semibold"
               >
                 <Mail className={`w-4 h-4 mr-2 ${sending ? 'animate-pulse' : ''}`} />
                 {sending ? 'Sending...' : 'Send Email'}
@@ -262,6 +264,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
                 variant="outline"
                 onClick={handleSyncAnalytics}
                 disabled={syncing}
+                className="btn-magical bg-transparent border border-yellow-400 text-yellow-400 hover:bg-yellow-400/10"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
                 {syncing ? 'Syncing...' : 'Sync Analytics'}
@@ -272,18 +275,18 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
       </div>
       
       {showSuccess && (
-        <Alert className="mb-6 border-green-200 bg-green-50">
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800">
+        <Alert className="mb-6 magical-border bg-green-500/10 border border-green-500/30">
+          <CheckCircle2 className="h-4 w-4 text-green-500" />
+          <AlertDescription className="text-gray-100">
             <strong>Campaign sent successfully!</strong> Your email is being delivered to all recipients.
           </AlertDescription>
         </Alert>
       )}
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
+        <Card className="card-magical">
           <CardHeader>
-            <CardTitle className="text-lg">Campaign Design</CardTitle>
+            <CardTitle className="text-lg text-yellow-300">Campaign Design</CardTitle>
           </CardHeader>
           <CardContent>
             <img
@@ -293,7 +296,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
             />
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full btn-magical bg-transparent border border-yellow-400 text-yellow-400 hover:bg-yellow-400/10"
               onClick={() => window.open(campaign.canva_design_url, '_blank')}
             >
               <ExternalLink className="w-4 h-4 mr-2" />
@@ -302,30 +305,31 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="card-magical">
           <CardHeader>
-            <CardTitle className="text-lg">Distribution Channels</CardTitle>
+            <CardTitle className="text-lg text-yellow-300">Distribution Channels</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {campaign.distributed_channels.includes('email') && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  <span>Email Campaign</span>
+                  <Mail className="w-4 h-4 text-yellow-400" />
+                  <span className="text-gray-100">Email Campaign</span>
                 </div>
-                <Badge>{campaign.status === 'sent' ? 'Sent' : 'Ready'}</Badge>
+                <Badge className="badge-magical">{campaign.status === 'sent' ? 'Sent' : 'Ready'}</Badge>
               </div>
             )}
             
             {campaign.distributed_channels.includes('notion') && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  <span>Notion Database</span>
+                  <FileText className="w-4 h-4 text-yellow-400" />
+                  <span className="text-gray-100">Notion Database</span>
                 </div>
                 <Button
                   size="sm"
                   variant="ghost"
+                  className="btn-magical bg-transparent text-yellow-400 hover:bg-yellow-400/10 px-2 py-1"
                   onClick={async () => {
                     try {
                       // Fetch the user's Notion database info
@@ -355,8 +359,8 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Github className="w-4 h-4" />
-                    <span>Landing Page</span>
+                    <Github className="w-4 h-4 text-yellow-400" />
+                    <span className="text-gray-100">Landing Page</span>
                   </div>
                 </div>
                 
@@ -373,40 +377,40 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           <>
             {/* Email Campaign Info Card */}
             {mailchimpDetails && (
-              <Card className="md:col-span-2 lg:col-span-3">
+              <Card className="md:col-span-2 lg:col-span-3 card-magical">
                 <CardHeader>
-                  <CardTitle className="text-lg">Email Campaign Details</CardTitle>
+                  <CardTitle className="text-lg text-yellow-300">Email Campaign Details</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Subject</p>
-                      <p className="font-medium">{mailchimpDetails.settings?.subject_line || 'N/A'}</p>
+                      <p className="text-sm font-medium text-amber-300">Subject</p>
+                      <p className="font-medium text-gray-100">{mailchimpDetails.settings?.subject_line || 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Audience</p>
-                      <p className="font-medium flex items-center gap-2">
-                        <Users className="w-4 h-4" />
+                      <p className="text-sm font-medium text-amber-300">Audience</p>
+                      <p className="font-medium flex items-center gap-2 text-gray-100">
+                        <Users className="w-4 h-4 text-yellow-400" />
                         {mailchimpDetails.recipients?.list_name || 'N/A'}
                         {mailchimpDetails.recipients?.recipient_count && (
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-sm text-amber-300">
                             ({mailchimpDetails.recipients.recipient_count} recipients)
                           </span>
                         )}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Sent Time</p>
-                      <p className="font-medium flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
+                      <p className="text-sm font-medium text-amber-300">Sent Time</p>
+                      <p className="font-medium flex items-center gap-2 text-gray-100">
+                        <Clock className="w-4 h-4 text-yellow-400" />
                         {mailchimpDetails.send_time ? 
                           new Date(mailchimpDetails.send_time).toLocaleString() : 
                           'Sending...'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">From</p>
-                      <p className="font-medium">
+                      <p className="text-sm font-medium text-amber-300">From</p>
+                      <p className="font-medium text-gray-100">
                         {mailchimpDetails.settings?.from_name} ({mailchimpDetails.settings?.reply_to})
                       </p>
                     </div>
@@ -416,6 +420,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
                       <Button
                         variant="outline"
                         size="sm"
+                        className="btn-magical bg-transparent border border-yellow-400 text-yellow-400 hover:bg-yellow-400/10"
                         onClick={() => window.open(mailchimpDetails.archive_url, '_blank')}
                       >
                         <ExternalLink className="w-4 h-4 mr-2" />
@@ -434,14 +439,14 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
                 className="md:col-span-2 lg:col-span-3" 
               />
             ) : (
-              <Card className="md:col-span-2 lg:col-span-3">
+              <Card className="md:col-span-2 lg:col-span-3 card-magical">
                 <CardHeader>
-                  <CardTitle className="text-lg">Email Campaign Analytics</CardTitle>
+                  <CardTitle className="text-lg text-yellow-300">Email Campaign Analytics</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
+                  <Alert className="magical-border bg-yellow-400/10 border border-yellow-400/20">
+                    <AlertCircle className="h-4 w-4 text-yellow-400" />
+                    <AlertDescription className="text-gray-100">
                       Analytics data is not available yet. Email campaigns typically need a few minutes after sending before analytics become available. Click "Sync Analytics" to check for updates.
                     </AlertDescription>
                   </Alert>

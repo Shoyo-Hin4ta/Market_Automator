@@ -1,9 +1,8 @@
-import { createClient } from '@/app/src/lib/supabase/server'
+import { createClient } from '@/app/lib/supabase/server'
 import { NextRequest } from 'next/server'
-import { MailchimpService } from '@/app/src/services/mailchimp'
-import { NotionService } from '@/app/src/services/notion'
-import { GitHubService } from '@/app/src/services/github'
-import { OpenAIService } from '@/app/src/services/openai'
+import { MailchimpService } from '@/app/services/mailchimp'
+import { NotionService } from '@/app/services/notion'
+import { GitHubService } from '@/app/services/github'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -152,7 +151,7 @@ export async function POST(request: NextRequest) {
         }
         
         // Generate landing page HTML
-        const landingPageHtml = ai_content?.landing_page?.html || generateDefaultLandingPage(name, canva_thumbnail_url)
+        const landingPageHtml = ai_content?.landing?.html || generateDefaultLandingPage(name, canva_thumbnail_url)
         
         // Ensure repository exists
         const repoName = 'market-automator-campaigns'
@@ -226,9 +225,11 @@ export async function POST(request: NextRequest) {
           console.log('GitHub Pages might already be enabled or there was an error:', error)
         }
         
-        // Create or update file
+        // Create unique file path using timestamp to avoid conflicts
         const campaignSlug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-        const filePath = `campaigns/${campaignSlug}/index.html`
+        const timestamp = Date.now()
+        const uniqueSlug = `${campaignSlug}-${timestamp}`
+        const filePath = `campaigns/${uniqueSlug}/index.html`
         
         await github.createLandingPage(
           username,
@@ -238,7 +239,7 @@ export async function POST(request: NextRequest) {
           `Add landing page for ${name}`
         )
         
-        github_page_url = `https://${username}.github.io/${repoName}/campaigns/${campaignSlug}/`
+        github_page_url = `https://${username}.github.io/${repoName}/campaigns/${uniqueSlug}/`
         
       } catch (error) {
         console.error('GitHub error:', error)
@@ -260,8 +261,8 @@ export async function POST(request: NextRequest) {
         mailchimp_campaign_id,
         notion_page_id,
         github_page_url,
+        ai_content: ai_content || {},
         metadata: {
-          ai_content,
           creation_errors: errors
         }
       })
@@ -271,6 +272,24 @@ export async function POST(request: NextRequest) {
     if (campaignError) {
       console.error('Failed to create campaign:', campaignError)
       return new Response('Failed to create campaign record', { status: 500 })
+    }
+    
+    // Update Notion page with GitHub URL if both were created
+    if (notion_page_id && github_page_url && servicesMap.has('notion')) {
+      try {
+        const notionKey = servicesMap.get('notion')!
+        const notion = new NotionService(notionKey.encrypted_key)
+        
+        await notion.updateDatabaseEntry(notion_page_id, {
+          'GitHub URL': { url: github_page_url }
+        })
+        
+        console.log('Updated Notion page with GitHub URL')
+      } catch (error) {
+        console.error('Failed to update Notion with GitHub URL:', error)
+        // Don't fail the whole request if this update fails
+        errors.push(`Notion update: Failed to add GitHub URL to Notion page`)
+      }
     }
     
     // Return success with any errors that occurred

@@ -1,4 +1,4 @@
-import { MailchimpService } from '../../../../src/services/mailchimp'
+import { MailchimpService } from '../../../../services/mailchimp'
 import { NextRequest } from 'next/server'
 
 export async function POST(request: NextRequest) {

@@ -1,6 +1,6 @@
-import { createClient } from '@/app/src/lib/supabase/server'
+import { createClient } from '@/app/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { NotionService } from '@/app/src/services/notion'
+import { NotionService } from '@/app/services/notion'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()

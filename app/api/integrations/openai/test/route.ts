@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { OpenAIService } from '@/app/src/services/openai'
+import { OpenAIService } from '@/app/services/openai'
 
 export async function POST(request: NextRequest) {
   try {

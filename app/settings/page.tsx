@@ -3,15 +3,17 @@
 import { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { NotionSection } from '../src/components/settings/NotionSection'
-import { GitHubSection } from '../src/components/settings/GitHubSection'
-import { MailchimpSection } from '../src/components/settings/MailchimpSection'
-import { OpenAISection } from '../src/components/settings/OpenAISection'
-import { CanvaSection } from '../src/components/settings/CanvaSection'
-import { ProgressIndicator } from '../src/components/settings/ProgressIndicator'
-import { useIntegrations } from '../src/hooks/useIntegrations'
-import { useToast } from '../src/hooks/use-toast'
+import { NotionSection } from '@/app/components/settings/NotionSection'
+import { GitHubSection } from '@/app/components/settings/GitHubSection'
+import { MailchimpSection } from '@/app/components/settings/MailchimpSection'
+import { OpenAISection } from '@/app/components/settings/OpenAISection'
+import { CanvaSection } from '@/app/components/settings/CanvaSection'
+import { ProgressIndicator } from '@/app/components/settings/ProgressIndicator'
+import { useIntegrations } from '../hooks/useIntegrations'
+import { useToast } from '../hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
+import '@/app/styles/magical-theme.css'
+import '@/app/styles/settings-overrides.css'
 
 export default function SettingsPage() {
   const { integrations, loading } = useIntegrations()
@@ -56,23 +58,23 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-12 w-full skeleton-magical" />
+        <Skeleton className="h-64 w-full skeleton-magical" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 settings-page">
       <ProgressIndicator integrations={integrations} />
       
       <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="notion">Notion</TabsTrigger>
-          <TabsTrigger value="github">GitHub</TabsTrigger>
-          <TabsTrigger value="mailchimp">Mailchimp</TabsTrigger>
-          <TabsTrigger value="openai">OpenAI</TabsTrigger>
-          <TabsTrigger value="canva">Canva</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-5 magical-border" style={{ background: 'var(--card-bg)' }}>
+          <TabsTrigger value="notion" className="tab-magical">Notion</TabsTrigger>
+          <TabsTrigger value="github" className="tab-magical">GitHub</TabsTrigger>
+          <TabsTrigger value="mailchimp" className="tab-magical">Mailchimp</TabsTrigger>
+          <TabsTrigger value="openai" className="tab-magical">OpenAI</TabsTrigger>
+          <TabsTrigger value="canva" className="tab-magical">Canva</TabsTrigger>
         </TabsList>
         
         <TabsContent value="notion">

@@ -1,5 +1,5 @@
-import { createClient } from '@/app/src/lib/supabase/server'
-import { MailchimpService } from '@/app/src/services/mailchimp'
+import { createClient } from '@/app/lib/supabase/server'
+import { MailchimpService } from '@/app/services/mailchimp'
 import { NextRequest } from 'next/server'
 
 export async function GET(

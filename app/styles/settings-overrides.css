@@ -1,0 +1,329 @@
+/* Settings Page Specific Overrides */
+
+/* Force dark mode and override globals.css */
+body,
+.dark,
+:root {
+  --background: var(--thunder-dark) !important;
+  --foreground: var(--text-primary) !important;
+  --card: var(--card-bg-solid) !important;
+  --card-foreground: var(--text-primary) !important;
+  --muted-foreground: var(--text-secondary) !important;
+  --input: rgba(26, 8, 39, 0.6) !important;
+}
+
+/* Text Colors */
+.text-magical-heading {
+  color: var(--wizard-gold-light) !important;
+}
+
+.text-magical-secondary {
+  color: #d4a574 !important;
+}
+
+/* Fix Card Text Colors */
+.card-magical * {
+  color: var(--text-primary);
+}
+
+.card-magical p,
+.card-magical span:not([style*="color"]),
+.card-magical div:not([style*="color"]) {
+  color: var(--text-secondary) !important;
+}
+
+/* Labels in Settings */
+.card-magical label {
+  color: var(--wizard-gold-light) !important;
+}
+
+/* Input Field Overrides */
+.card-magical input:not([type="checkbox"]):not([type="radio"]),
+.card-magical textarea,
+.card-magical select {
+  background: rgba(26, 8, 39, 0.6) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid rgba(251, 191, 36, 0.2) !important;
+  transition: all 0.3s ease;
+}
+
+.card-magical input:not([type="checkbox"]):not([type="radio"]):focus,
+.card-magical textarea:focus,
+.card-magical select:focus {
+  background: rgba(26, 8, 39, 0.8) !important;
+  border-color: var(--wizard-gold) !important;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2) !important;
+  outline: none !important;
+}
+
+.card-magical input::placeholder {
+  color: rgba(212, 165, 116, 0.5) !important;
+}
+
+/* Fix Tab Content Areas */
+[role="tabpanel"] {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fix Card Hover Effects */
+.card-magical {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+.card-magical:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 20px rgba(251, 191, 36, 0.15) !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+}
+
+/* Prevent hover conflicts with section changes */
+.card-magical * {
+  pointer-events: auto;
+}
+
+/* Ensure proper event handling for design cards */
+.card-magical .group {
+  position: relative;
+}
+
+.card-magical button {
+  pointer-events: auto !important;
+}
+
+/* Button Text Colors in Cards */
+.card-magical button {
+  color: inherit !important;
+}
+
+.card-magical button:disabled {
+  opacity: 0.5;
+}
+
+/* Links in Cards */
+.card-magical a {
+  color: var(--wizard-gold) !important;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.card-magical a:hover {
+  color: var(--wizard-gold-light) !important;
+  text-decoration: underline;
+}
+
+/* Fix Test Connection Component */
+.btn-magical {
+  color: var(--wizard-gold) !important;
+}
+
+.btn-magical:hover:not(:disabled) {
+  color: var(--wizard-gold-light) !important;
+}
+
+/* Success/Error Messages */
+.text-green-600 {
+  color: #4ade80 !important;
+}
+
+.text-red-600 {
+  color: #ef4444 !important;
+}
+
+/* Tab Triggers */
+.tab-magical {
+  color: var(--text-secondary) !important;
+}
+
+.tab-magical:hover {
+  color: var(--wizard-gold-light) !important;
+}
+
+.tab-magical[data-state="active"] {
+  color: var(--wizard-gold) !important;
+}
+
+/* Info/Warning Boxes */
+.card-magical .bg-amber-50,
+.card-magical [class*="bg-amber-950"] {
+  background: rgba(251, 191, 36, 0.1) !important;
+}
+
+.card-magical .border-amber-200,
+.card-magical [class*="border-amber-800"] {
+  border-color: rgba(251, 191, 36, 0.2) !important;
+}
+
+.card-magical .text-amber-800,
+.card-magical [class*="text-amber-200"] {
+  color: var(--wizard-gold-light) !important;
+}
+
+/* Force pointer events on buttons */
+.card-magical button,
+.card-magical [role="button"] {
+  pointer-events: auto !important;
+}
+
+/* Ensure distribute button is clickable */
+.btn-magical.pointer-events-auto {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 20 !important;
+}
+
+/* Ensure hover overlay doesn't block clicks */
+.group:hover .pointer-events-none {
+  pointer-events: none !important;
+}
+
+.group:hover .pointer-events-none .pointer-events-auto {
+  pointer-events: auto !important;
+}
+
+/* Badge Connected State */
+.badge-magical {
+  font-weight: 600;
+}
+
+/* Icon Colors */
+.card-magical svg {
+  color: currentColor;
+}
+
+/* Loading States */
+.card-magical .animate-spin {
+  color: var(--wizard-gold) !important;
+}
+
+/* Disabled States */
+.card-magical input:disabled,
+.card-magical textarea:disabled,
+.card-magical select:disabled {
+  background: rgba(15, 5, 23, 0.4) !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* External Link Icons */
+.card-magical svg.h-3.w-3 {
+  color: currentColor !important;
+  opacity: 0.8;
+}
+
+/* Override any inline dark text */
+.card-magical [style*="color: black"],
+.card-magical [style*="color: #000"],
+.card-magical [style*="color: rgb(0"],
+.card-magical [style*="color:#000"] {
+  color: var(--text-primary) !important;
+}
+
+/* Select/Dropdown Component Overrides */
+[role="combobox"] {
+  background: rgba(26, 8, 39, 0.6) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid rgba(251, 191, 36, 0.2) !important;
+}
+
+[role="combobox"]:focus {
+  background: rgba(26, 8, 39, 0.8) !important;
+  border-color: var(--wizard-gold) !important;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2) !important;
+}
+
+/* Dropdown Content */
+[role="listbox"] {
+  background: var(--card-bg-solid) !important;
+  border: 1px solid var(--border-magical) !important;
+  color: var(--text-primary) !important;
+}
+
+[role="option"] {
+  color: var(--text-secondary) !important;
+}
+
+[role="option"]:hover,
+[role="option"]:focus {
+  background: rgba(251, 191, 36, 0.1) !important;
+  color: var(--wizard-gold) !important;
+}
+
+[role="option"][data-highlighted] {
+  background: rgba(251, 191, 36, 0.2) !important;
+  color: var(--wizard-gold-light) !important;
+}
+
+/* Fix Button Styles in Settings */
+.card-magical .btn-magical {
+  background: transparent !important;
+  border: 1px solid var(--wizard-gold) !important;
+  color: var(--wizard-gold) !important;
+}
+
+.card-magical .btn-magical:hover:not(:disabled) {
+  background: rgba(251, 191, 36, 0.1) !important;
+  border-color: var(--wizard-gold-light) !important;
+  color: var(--wizard-gold-light) !important;
+}
+
+.card-magical button[style*="background: linear-gradient"] {
+  color: var(--thunder-dark) !important;
+}
+
+/* Ensure all text in magical cards is visible */
+.card-magical,
+.card-magical * {
+  color: inherit;
+}
+
+/* Fix specific Tailwind utility classes */
+.card-magical .text-sm,
+.card-magical .text-xs,
+.card-magical .text-base {
+  color: inherit;
+}
+
+/* Force dark background for settings page */
+main,
+[role="main"] {
+  background: var(--thunder-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Ensure settings page is always in dark mode */
+.settings-page,
+.settings-page * {
+  color-scheme: dark !important;
+}
+
+/* Fix Label Component Colors */
+label {
+  color: var(--wizard-gold-light) !important;
+  font-weight: 500;
+}
+
+/* Ensure proper contrast for all text elements */
+p, span, div {
+  color: var(--text-secondary);
+}
+
+/* Override any remaining light mode styles */
+.bg-white,
+.bg-gray-50,
+.bg-gray-100,
+.bg-gray-200 {
+  background: var(--card-bg-solid) !important;
+  color: var(--text-primary) !important;
+}

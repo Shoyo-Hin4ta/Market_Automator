@@ -1,6 +1,6 @@
-import { createClient } from '@/app/src/lib/supabase/server'
-import { GitHubService } from '@/app/src/services/github'
-import { generateLandingPageHTML } from '@/app/src/templates/landing-page'
+import { createClient } from '@/app/lib/supabase/server'
+import { GitHubService } from '@/app/services/github'
+import { generateLandingPageHTML } from '@/app/templates/landing-page'
 import { NextResponse } from 'next/server'
 
 export async function POST() {

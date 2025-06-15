@@ -1,6 +1,6 @@
-import { createClient } from '@/app/src/lib/supabase/server'
-import { syncMailchimpAnalytics } from '@/app/src/services/mailchimp-analytics'
-import { NotionService } from '@/app/src/services/notion'
+import { createClient } from '@/app/lib/supabase/server'
+import { syncMailchimpAnalytics } from '@/app/services/mailchimp-analytics'
+import { NotionService } from '@/app/services/notion'
 import { NextRequest } from 'next/server'
 
 export async function POST(

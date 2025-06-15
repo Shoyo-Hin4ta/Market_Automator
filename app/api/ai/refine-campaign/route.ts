@@ -1,5 +1,5 @@
-import { createClient } from '@/app/src/lib/supabase/server'
-import { AIContentService } from '@/app/src/services/ai-content'
+import { createClient } from '@/app/lib/supabase/server'
+import { MultiAgentCampaignService } from '@/app/services/multi-agent-campaign'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -31,21 +31,13 @@ export async function POST(request: NextRequest) {
       currentLanding,
       selectedChannels,
       skipAnalysis = false,
-      action,
-      colorDescription,
-      brandInfo,
-      selectedPalette,
+      selectedColors,
       themeStyle,
-      templateType = 'standard' 
+      aiDecideColors = false
     } = await request.json()
     
-    const aiService = new AIContentService(apiKeyData.encrypted_key)
+    const aiService = new MultiAgentCampaignService(apiKeyData.encrypted_key)
     
-    // Handle palette generation request
-    if (action === 'generatePalettes') {
-      const palettes = await aiService.generatePaletteOptions(colorDescription, brandInfo)
-      return NextResponse.json({ palettes })
-    }
     
     const latestMessage = messages[messages.length - 1].content
     
@@ -53,111 +45,92 @@ export async function POST(request: NextRequest) {
     const isRefinement = currentEmail || currentLanding
     
     if (isRefinement) {
-      // Refine existing content based on instruction
-      let emailHtml = currentEmail
-      let landingHtml = currentLanding
-      
-      if (selectedChannels.includes('email') && currentEmail) {
-        emailHtml = await aiService.refineContent(currentEmail, latestMessage, 'email')
-      }
-      if ((selectedChannels.includes('github') || selectedChannels.includes('landing')) && currentLanding) {
-        landingHtml = await aiService.refineContent(currentLanding, latestMessage, 'landing')
-      }
+      // Refine existing content
+      const result = await aiService.refineContent(
+        {
+          currentEmail,
+          currentLanding,
+          agentContext: {
+            formData: { selectedColors, themeStyle },
+            campaignName,
+            designUrl,
+            selectedChannels,
+          },
+        },
+        latestMessage
+      );
       
       return NextResponse.json({
-        email: emailHtml,
-        landing: landingHtml,
-        message: 'I\'ve updated the content based on your feedback. Check the preview!',
+        email: result.email,
+        landing: result.landing,
+        message: result.message,
         context: null
       })
     }
     
-    // For initial generation, check if we should skip analysis
-    if (!skipAnalysis) {
-      // Original flow - analyze if we have enough info
-      const analysis = await aiService.analyzeConversation(messages)
-      
-      if (!analysis.hasEnoughInfo) {
-        // Generate clarifying questions
-        const questions = await aiService.generateClarifyingQuestions(analysis)
-        
-        return NextResponse.json({
-          email: null,
-          landing: null,
-          message: questions,
-          context: null,
-          needsMoreInfo: true
-        })
-      }
+    // Initial generation with multi-agent system
+    const formData = {
+      product: '', // Extract from messages
+      audience: '', // Extract from messages
+      purpose: '', // Extract from messages
+      tone: 'professional',
+      theme: themeStyle || 'modern',
+      ctaEnabled: true,
+      ctaText: 'Get Started',
+      ctaLink: '#',
+      selectedColors: selectedColors || null, // Direct color selection or null for AI generation
+      campaignName,
+      designUrl,
     }
     
-    // We have enough info, extract full context and generate content
-    const context = await aiService.extractContext(latestMessage, messages, selectedPalette, themeStyle)
-    
-    let emailHtml = null
-    let landingHtml = null
-    let responseMessage = ''
-    
-    // Generate content with themes
-    if (selectedChannels.includes('email')) {
-      emailHtml = await aiService.generateEmailContent(context, campaignName, designUrl)
-    }
-    if (selectedChannels.includes('github') || selectedChannels.includes('landing')) {
-      if (templateType === 'scrollytelling') {
-        // Generate scrollytelling content
-        const scrollyContent = await aiService.generateScrollytellingContent(
-          campaignName,
-          context,
-          context.landingTheme || context.emailTheme
-        )
-        
-        // Import the template and generate HTML
-        const { generateScrollytellingLandingPage } = await import('@/app/src/templates/scrollytelling-landing-page')
-        
-        landingHtml = generateScrollytellingLandingPage(
-          scrollyContent,
-          {
-            primary: context.landingTheme?.primaryColor || '#667eea',
-            secondary: context.landingTheme?.secondaryColor || '#764ba2',
-            accent: context.landingTheme?.accentColor || '#fbbf24',
-            background: context.landingTheme?.backgroundColor || '#0a0a0a',
-            text: context.landingTheme?.textColor || '#e9d5ff'
-          },
-          designUrl,
-          context.landingTheme?.fontFamily || 'Playfair Display'
-        )
-      } else {
-        landingHtml = await aiService.generateLandingPageContent(context, campaignName, designUrl)
-      }
+    // Parse the form description from the message
+    const formDescriptionMatch = latestMessage.match(/I want to create a campaign for (.+?)\. My target audience is (.+?)\. The purpose of this campaign is (.+?)\./s)
+    if (formDescriptionMatch) {
+      formData.product = formDescriptionMatch[1]
+      formData.audience = formDescriptionMatch[2]
+      formData.purpose = formDescriptionMatch[3]
     }
     
-    // Create contextual response with theme info
-    const themeInfo = context.emailTheme?.style === context.landingTheme?.style
-      ? `I've created content with a ${context.emailTheme?.style} theme using ${context.emailTheme?.fontFamily} font.`
-      : `I've created content with a ${context.emailTheme?.style} theme for email and ${context.landingTheme?.style} theme for the landing page.`
-    
-    responseMessage = `Perfect! ${themeInfo} The content focuses on ${context.product} for ${context.audience}.`
-    
-    if (context.ctaEnabled) {
-      responseMessage += context.ctaLink && context.ctaLink !== '#' 
-        ? ` The CTA buttons link to ${context.ctaLink}.`
-        : ' I\'ve added CTA buttons - let me know where they should link to.'
+    // Parse tone and theme
+    const toneMatch = latestMessage.match(/I want a (\w+) tone/)
+    if (toneMatch) {
+      formData.tone = toneMatch[1] as any
     }
     
-    // Add channel-specific info
-    if (selectedChannels.includes('email') && (selectedChannels.includes('github') || selectedChannels.includes('landing'))) {
-      responseMessage += ' Both email and landing page are ready in the preview tabs.'
-    } else if (selectedChannels.includes('email')) {
-      responseMessage += ' Your email is ready in the preview.'
-    } else {
-      responseMessage += ' Your landing page is ready in the preview.'
+    const themeMatch = latestMessage.match(/with a (\w+) theme/)
+    if (themeMatch) {
+      formData.theme = themeMatch[1]
     }
+    
+    // Parse CTA info
+    const ctaMatch = latestMessage.match(/Include a CTA button "(.+?)" linking to (.+)/)
+    if (ctaMatch) {
+      formData.ctaText = ctaMatch[1]
+      formData.ctaLink = ctaMatch[2]
+    } else if (latestMessage.includes('No CTA buttons needed')) {
+      formData.ctaEnabled = false
+    }
+    
+    // Generate colors if AI Decide is enabled
+    if (aiDecideColors && !formData.selectedColors) {
+      const { BrandAgent } = await import('@/app/services/agents/brand-agent')
+      const brandAgent = new BrandAgent(apiKeyData.encrypted_key)
+      const generatedColors = await brandAgent.generateColorPalette(formData)
+      formData.selectedColors = generatedColors
+    }
+    
+    const result = await aiService.generateInitialContent(
+      formData,
+      null, // selectedDesign
+      selectedChannels
+    )
     
     return NextResponse.json({
-      email: emailHtml,
-      landing: landingHtml,
-      message: responseMessage,
-      context
+      email: result.email,
+      landing: result.landing,
+      message: result.message,
+      context: result.context,
+      generatedColors: aiDecideColors ? formData.selectedColors : null
     })
     
   } catch (error) {

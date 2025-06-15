@@ -1,15 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DesignGrid } from '@/app/src/components/dashboard/DesignGrid'
-import { GroupedDesignGrid } from '@/app/src/components/dashboard/GroupedDesignGrid'
-import { DesignFilters } from '@/app/src/components/dashboard/DesignFilters'
-import { useCanvaDesigns } from '@/app/src/hooks/useCanvaDesigns'
+import { DesignGrid } from '@/app/components/dashboard/DesignGrid'
+import { GroupedDesignGrid } from '@/app/components/dashboard/GroupedDesignGrid'
+import { DesignFilters } from '@/app/components/dashboard/DesignFilters'
+import { useCanvaDesigns } from '@/app/hooks/useCanvaDesigns'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { DesignCategory } from '@/app/src/types/canva'
-import { detectDesignCategory } from '@/app/src/lib/constants/design-categories'
+import { DesignCategory } from '@/app/types/canva'
+import { detectDesignCategory } from '@/app/lib/constants/design-categories'
+import '@/app/styles/magical-theme.css'
+import '@/app/styles/settings-overrides.css'
 
 export default function DashboardPage() {
   const { designs, loading, error, connected, refetch } = useCanvaDesigns()
@@ -67,14 +69,15 @@ export default function DashboardPage() {
     return (
       <div className="text-center py-12 space-y-4">
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold">Connect Your Canva Account</h2>
-          <p className="text-muted-foreground max-w-md mx-auto">
+          <h2 className="text-2xl font-semibold text-foreground">Connect Your Canva Account</h2>
+          <p className="max-w-md mx-auto text-muted-foreground">
             To view and distribute your designs, you need to connect your Canva account first.
           </p>
         </div>
         <Button 
           onClick={() => window.location.href = '/settings?tab=canva'}
           size="lg"
+          className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-0 shadow-md hover:shadow-lg transition-all"
         >
           Connect Canva Account
         </Button>
@@ -95,13 +98,14 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold">Your Designs</h2>
+          <h2 className="text-xl font-semibold text-foreground">Your Designs</h2>
           <p className="text-muted-foreground">
             Select a design to create a marketing campaign
           </p>
         </div>
         <Button
           onClick={() => window.open('https://www.canva.com/', '_blank')}
+          className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white border-0 shadow-md hover:shadow-lg transition-all font-semibold"
         >
           <Plus className="w-4 h-4 mr-2" />
           Create in Canva

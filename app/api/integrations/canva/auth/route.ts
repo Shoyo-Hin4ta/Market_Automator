@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '../../../../src/lib/supabase/server'
-import { CANVA_CONFIG, generateCodeVerifier, generateCodeChallenge, generateState } from '../../../../src/lib/canva/config'
+import { createClient } from '../../../../lib/supabase/server'
+import { CANVA_CONFIG, generateCodeVerifier, generateCodeChallenge, generateState } from '../../../../lib/canva/config'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()

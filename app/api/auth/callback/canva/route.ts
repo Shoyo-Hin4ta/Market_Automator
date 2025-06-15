@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '../../../../src/lib/supabase/server'
-import { CANVA_CONFIG } from '../../../../src/lib/canva/config'
+import { createClient } from '../../../../lib/supabase/server'
+import { CANVA_CONFIG } from '../../../../lib/canva/config'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams

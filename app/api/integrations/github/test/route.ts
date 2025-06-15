@@ -1,5 +1,5 @@
-import { createClient } from '@/app/src/lib/supabase/server'
-import { GitHubService } from '@/app/src/services/github'
+import { createClient } from '@/app/lib/supabase/server'
+import { GitHubService } from '@/app/services/github'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {

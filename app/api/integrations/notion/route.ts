@@ -1,4 +1,4 @@
-import { createClient } from '@/app/src/lib/supabase/server'
+import { createClient } from '@/app/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     
     // If requested, create a database first
     if (createDatabase && (!existingDatabases || existingDatabases.length === 0)) {
-      const { NotionService } = await import('@/app/src/services/notion')
+      const { NotionService } = await import('@/app/services/notion')
       const notion = new NotionService(integrationToken)
       
       try {

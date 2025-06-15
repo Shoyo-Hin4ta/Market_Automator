@@ -1,103 +1,268 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { Button } from "@/components/ui/button"
+import Link from 'next/link'
+import { ArrowRight, Sparkles, Zap, Globe, Mail, FileText } from 'lucide-react'
+import '@/app/styles/magical-theme.css'
+
+export default function LandingPage() {
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="overflow-x-hidden text-white">
+      <style jsx global>{`
+        :root {
+          --dark-gradient: linear-gradient(135deg, var(--thunder-dark) 0%, var(--thunder-purple) 50%, var(--wizard-purple-darker) 100%);
+        }
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        body {
+          background: var(--dark-gradient);
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-20px) rotate(5deg);
+          }
+        }
+
+        .hero-title {
+          animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+          animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero-buttons {
+          animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .floating-orb {
+          filter: drop-shadow(0 0 30px var(--wizard-glow));
+          animation: float 3s ease-in-out infinite;
+        }
+
+        .hero-glow {
+          position: absolute;
+          width: 500px;
+          height: 500px;
+          background: radial-gradient(circle, var(--wizard-glow) 0%, transparent 70%);
+          filter: blur(80px);
+          animation: pulse-glow 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+          0%, 100% { transform: scale(1); opacity: 0.5; }
+          50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .section {
+          position: relative;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .reveal-section {
+          animation: fadeIn 0.8s ease-out;
+        }
+
+        .sparkle-effect {
+          position: absolute;
+          width: 2px;
+          height: 2px;
+          background: var(--wizard-gold);
+          border-radius: 50%;
+          pointer-events: none;
+          animation: sparkle 3s linear infinite;
+        }
+
+        .feature-card {
+          background: var(--card-bg);
+          border: 1px solid var(--border-magical);
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+          animation: fadeInUp 0.8s ease-out;
+        }
+
+        .feature-card:hover {
+          transform: translateY(-4px);
+          border-color: var(--wizard-gold);
+          box-shadow: 0 20px 40px var(--wizard-glow);
+        }
+
+        .feature-card:nth-child(1) {
+          animation-delay: 0.1s;
+        }
+
+        .feature-card:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+
+        .feature-card:nth-child(3) {
+          animation-delay: 0.3s;
+        }
+      `}</style>
+
+      {/* Hero Section: The Summoning */}
+      <section className="section hero relative magical-gradient overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at top right, rgba(251, 191, 36, 0.1), transparent 50%)' }}></div>
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at bottom left, rgba(102, 126, 234, 0.1), transparent 50%)' }}></div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <h1 className="hero-title text-6xl md:text-8xl font-bold mb-6">
+            <span className="shimmer-text">Marketing Wizard</span>
+          </h1>
+          <p className="hero-subtitle text-2xl md:text-3xl mb-8" style={{ color: 'var(--text-secondary)' }}>
+            Transform your Canva designs into magical marketing campaigns
+          </p>
+          <div className="floating-orb inline-block relative">
+            <div className="hero-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+            <div className="w-32 h-32 md:w-48 md:h-48 rounded-full flex items-center justify-center relative z-10" style={{ background: 'linear-gradient(135deg, var(--wizard-gold) 0%, var(--wizard-gold-light) 100%)' }}>
+              <Sparkles className="w-16 h-16 md:w-24 md:h-24 text-white" />
+            </div>
+          </div>
+          <div className="hero-buttons mt-12 space-x-4">
+            <Link href="/register">
+              <Button size="lg" className="btn-magical golden-glow" style={{ background: 'linear-gradient(135deg, var(--wizard-gold) 0%, var(--wizard-gold-dark) 100%)', border: 'none', color: 'white' }}>
+                Start Your Journey <ArrowRight className="ml-2" />
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline" className="btn-magical" style={{ borderColor: 'var(--wizard-gold)', color: 'var(--wizard-gold)' }}>
+                Sign In
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 2: The Transformation */}
+      <section className="section reveal-section relative" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, rgba(102, 126, 234, 0.05) 50%, #0a0a0a 100%)' }}>
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 left-0 w-96 h-96 rounded-full" style={{ background: 'radial-gradient(circle, rgba(251, 191, 36, 0.1), transparent 70%)' }}></div>
+        </div>
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <h2 className="text-5xl md:text-6xl font-bold mb-8 shimmer-text">The Transformation</h2>
+          <p className="text-xl md:text-2xl mb-12" style={{ color: 'var(--text-secondary)' }}>
+            Watch as your Canva designs become enchanted with AI-powered content
+          </p>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="feature-card p-6 rounded-lg">
+              <Zap className="w-12 h-12 mb-4 mx-auto" style={{ color: 'var(--wizard-gold)' }} />
+              <h3 className="text-xl font-semibold mb-2">AI Content Magic</h3>
+              <p style={{ color: '#fbbf24' }}>Intelligent content generation tailored to your audience</p>
+            </div>
+            <div className="feature-card p-6 rounded-lg">
+              <Sparkles className="w-12 h-12 mb-4 mx-auto" style={{ color: 'var(--wizard-gold)' }} />
+              <h3 className="text-xl font-semibold mb-2">Design Alchemy</h3>
+              <p style={{ color: '#fbbf24' }}>Transform static designs into dynamic campaigns</p>
+            </div>
+            <div className="feature-card p-6 rounded-lg">
+              <Globe className="w-12 h-12 mb-4 mx-auto" style={{ color: 'var(--wizard-gold)' }} />
+              <h3 className="text-xl font-semibold mb-2">Multi-Channel Spells</h3>
+              <p style={{ color: '#fbbf24' }}>Deploy across email, web, and social platforms</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 3: The Distribution Spell */}
+      <section className="section reveal-section relative" style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, rgba(251, 191, 36, 0.03) 100%)' }}>
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full" style={{ background: 'radial-gradient(circle, rgba(102, 126, 234, 0.15), transparent 60%)' }}></div>
+        </div>
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <h2 className="text-5xl md:text-6xl font-bold mb-8 shimmer-text">The Distribution Spell</h2>
+          <p className="text-xl md:text-2xl mb-12" style={{ color: 'var(--text-secondary)' }}>
+            Cast your campaigns across multiple realms with a single incantation
+          </p>
+          <div className="flex flex-wrap justify-center gap-8">
+            <div className="flex flex-col items-center">
+              <div className="w-24 h-24 rounded-full flex items-center justify-center mb-4 card-magical">
+                <Mail className="w-12 h-12" style={{ color: 'var(--wizard-gold)' }} />
+              </div>
+              <span className="text-lg">Mailchimp</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-24 h-24 rounded-full flex items-center justify-center mb-4 card-magical">
+                <FileText className="w-12 h-12" style={{ color: 'var(--wizard-gold)' }} />
+              </div>
+              <span className="text-lg">Notion</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-24 h-24 rounded-full flex items-center justify-center mb-4 card-magical">
+                <Globe className="w-12 h-12" style={{ color: 'var(--wizard-gold)' }} />
+              </div>
+              <span className="text-lg">GitHub Pages</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 4: The Enchanted Results */}
+      <section className="section reveal-section relative" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, rgba(102, 126, 234, 0.08) 50%, rgba(251, 191, 36, 0.05) 100%)' }}>
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <h2 className="text-5xl md:text-6xl font-bold mb-8 shimmer-text">The Enchanted Results</h2>
+          <p className="text-xl md:text-2xl mb-12" style={{ color: 'var(--text-secondary)' }}>
+            Witness the power of your campaigns through mystical analytics
+          </p>
+          <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+            <div className="feature-card p-8 rounded-lg">
+              <h3 className="text-4xl font-bold mb-2" style={{ color: 'var(--wizard-gold)' }}>95%</h3>
+              <p className="text-lg">Open Rate Enchantment</p>
+            </div>
+            <div className="feature-card p-8 rounded-lg">
+              <h3 className="text-4xl font-bold mb-2" style={{ color: 'var(--wizard-gold)' }}>10x</h3>
+              <p className="text-lg">Engagement Amplification</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section: Enter the Portal */}
+      <section className="section reveal-section relative magical-gradient">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, rgba(251, 191, 36, 0.15), transparent 50%)' }}></div>
+        </div>
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <h2 className="text-5xl md:text-6xl font-bold mb-8 shimmer-text">Enter the Portal</h2>
+          <p className="text-xl md:text-2xl mb-12" style={{ color: 'var(--text-secondary)' }}>
+            Begin your transformation into a Marketing Wizard today
+          </p>
+          <div className="space-y-6">
+            <Link href="/register">
+              <Button size="lg" className="btn-magical golden-glow text-lg px-8 py-6" style={{ background: 'linear-gradient(135deg, var(--wizard-gold) 0%, var(--wizard-gold-dark) 100%)', border: 'none', color: 'white' }}>
+                Start Now <ArrowRight className="ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
-  );
+  )
 }

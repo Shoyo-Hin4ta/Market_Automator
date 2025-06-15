@@ -1,6 +1,6 @@
-import { createClient } from '@/app/src/lib/supabase/server'
-import { MailchimpService } from '@/app/src/services/mailchimp'
-import { NotionService } from '@/app/src/services/notion'
+import { createClient } from '@/app/lib/supabase/server'
+import { MailchimpService } from '@/app/services/mailchimp'
+import { NotionService } from '@/app/services/notion'
 import { NextRequest } from 'next/server'
 
 export async function POST(

@@ -8,23 +8,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, AlertCircle, Rocket, Mail, FileText, Github, Loader2 } from 'lucide-react'
-import { useToast } from '@/app/src/hooks/use-toast'
-import { useIntegrations } from '@/app/src/hooks/useIntegrations'
-import { useAIContent } from '@/app/src/hooks/useAIContent'
+import { ArrowLeft, AlertCircle, Rocket, Mail, FileText, Github } from 'lucide-react'
+import { useToast } from '@/app/hooks/use-toast'
+import { useIntegrations } from '@/app/hooks/useIntegrations'
+import '@/app/styles/magical-theme.css'
 
 export default function NewCampaignPage() {
   const router = useRouter()
   const { toast } = useToast()
   const { integrations, loading: integrationsLoading } = useIntegrations()
-  const { generateEmail, generateLandingPage, loading: aiLoading } = useAIContent()
   
   const [selectedDesign, setSelectedDesign] = useState<any>(null)
   const [campaignName, setCampaignName] = useState('')
   const [selectedChannels, setSelectedChannels] = useState<string[]>([])
-  const [isCreating, setIsCreating] = useState(false)
-  const [isGeneratingContent, setIsGeneratingContent] = useState(false)
-  const [aiContent, setAiContent] = useState<any>(null)
   
   // Determine available channels based on connected integrations
   const availableChannels = [
@@ -58,119 +54,90 @@ export default function NewCampaignPage() {
     )
   }
   
-  const handleGenerateContent = async () => {
-    if (!selectedDesign || !campaignName) return
-    
-    setIsGeneratingContent(true)
-    const content: any = {}
-    
-    try {
-      // Generate email content if email channel is selected
-      if (selectedChannels.includes('email')) {
-        const emailContent = await generateEmail({
-          campaignName,
-          designUrl: selectedDesign.thumbnail?.url,
-          tone: 'professional'
-        })
-        
-        content.email = {
-          subject: emailContent.subject,
-          preview: emailContent.preview,
-          html: emailContent.html,
-          from_name: 'Marketing Team'
-        }
-      }
-      
-      // Generate landing page content if GitHub is selected
-      if (selectedChannels.includes('github')) {
-        const landingContent = await generateLandingPage({
-          campaignName,
-          designUrl: selectedDesign.thumbnail?.url,
-          tone: 'professional'
-        })
-        
-        content.landing_page = {
-          title: landingContent.title,
-          html: landingContent.html
-        }
-      }
-      
-      setAiContent(content)
-      
+  const handleCustomizeCampaign = () => {
+    if (!selectedDesign || !campaignName || selectedChannels.length === 0) {
       toast({
-        title: 'Content generated!',
-        description: 'AI has generated optimized content for your campaign.',
-      })
-    } catch (error) {
-      toast({
-        title: 'Failed to generate content',
-        description: error instanceof Error ? error.message : 'Please try again',
+        title: 'Missing information',
+        description: 'Please fill in all required fields',
         variant: 'destructive'
       })
-    } finally {
-      setIsGeneratingContent(false)
+      return
     }
+    
+    // Navigate to the customize page with parameters
+    const params = new URLSearchParams({
+      name: campaignName,
+      design: selectedDesign.id,
+      designUrl: selectedDesign.thumbnail?.url || '',
+      channels: selectedChannels.join(',')
+    })
+    
+    // Store full design data in sessionStorage for the customize page
+    sessionStorage.setItem('currentDesign', JSON.stringify(selectedDesign))
+    
+    router.push(`/campaigns/new/customize?${params.toString()}`)
   }
   
-  const handleCreateCampaign = async () => {
-    if (!selectedDesign || !campaignName || selectedChannels.length === 0) return
-    
-    setIsCreating(true)
-    try {
-      const response = await fetch('/api/campaigns/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: campaignName,
-          canva_design_id: selectedDesign.id,
-          canva_design_url: selectedDesign.urls?.view_url || `https://www.canva.com/design/${selectedDesign.id}/view`,
-          canva_thumbnail_url: selectedDesign.thumbnail?.url,
-          selected_channels: selectedChannels,
-          ai_content: aiContent
-        })
-      })
-      
-      if (!response.ok) throw new Error('Failed to create campaign')
-      
-      const data = await response.json()
-      
-      // Show warnings if any
-      if (data.warnings && data.warnings.length > 0) {
-        data.warnings.forEach((warning: string) => {
-          toast({
-            title: 'Warning',
-            description: warning,
-            variant: 'destructive'
-          })
-        })
-      }
-      
-      toast({
-        title: 'Campaign created!',
-        description: 'Your campaign has been created and distributed to selected channels.',
-      })
-      
-      // Clear selected design and navigate to campaigns
-      sessionStorage.removeItem('selectedDesign')
-      router.push('/campaigns')
-    } catch (error) {
-      toast({
-        title: 'Failed to create campaign',
-        description: error instanceof Error ? error.message : 'Please try again',
-        variant: 'destructive'
-      })
-    } finally {
-      setIsCreating(false)
-    }
-  }
   
   if (integrationsLoading) {
     return (
       <div className="container mx-auto py-8 max-w-4xl">
-        <div className="flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-10 h-10 rounded-md skeleton-magical" />
+          <div>
+            <div className="h-8 w-64 mb-2 rounded skeleton-magical" />
+            <div className="h-5 w-96 rounded skeleton-magical" />
+          </div>
+        </div>
+        
+        <div className="grid gap-6">
+          {/* Selected Design Skeleton */}
+          <Card className="card-magical">
+            <CardHeader>
+              <div className="h-6 w-32 mb-2 rounded skeleton-magical" />
+              <div className="h-4 w-64 rounded skeleton-magical" />
+            </CardHeader>
+            <CardContent style={{ background: 'transparent' }}>
+              <div className="flex gap-4 items-start">
+                <div className="w-32 h-32 rounded-lg skeleton-magical" />
+                <div className="flex-1">
+                  <div className="h-5 w-48 mb-2 rounded skeleton-magical" />
+                  <div className="h-4 w-32 rounded skeleton-magical" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Campaign Details Skeleton */}
+          <Card className="card-magical">
+            <CardHeader>
+              <div className="h-6 w-40 mb-2 rounded skeleton-magical" />
+              <div className="h-4 w-56 rounded skeleton-magical" />
+            </CardHeader>
+            <CardContent className="space-y-6" style={{ background: 'transparent' }}>
+              <div>
+                <div className="h-4 w-32 mb-2 rounded skeleton-magical" />
+                <div className="h-10 w-full rounded skeleton-magical" />
+              </div>
+              
+              <div className="space-y-3">
+                <div className="h-4 w-40 mb-2 rounded skeleton-magical" />
+                <div className="h-4 w-64 mb-3 rounded skeleton-magical" />
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center space-x-3">
+                    <div className="w-4 h-4 rounded skeleton-magical" />
+                    <div className="h-4 w-32 rounded skeleton-magical" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Action Buttons Skeleton */}
+          <div className="flex gap-3">
+            <div className="h-10 w-40 rounded skeleton-magical" />
+            <div className="h-10 w-48 rounded skeleton-magical" />
+          </div>
         </div>
       </div>
     )
@@ -179,15 +146,19 @@ export default function NewCampaignPage() {
   if (availableChannels.length === 0) {
     return (
       <div className="container mx-auto py-8 max-w-4xl">
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="magical-border" style={{ background: 'var(--card-bg)', borderColor: 'rgba(255, 0, 0, 0.3)' }}>
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>No integrations connected</AlertTitle>
-          <AlertDescription>
+          <AlertTitle style={{ color: '#fcd34d' }}>No integrations connected</AlertTitle>
+          <AlertDescription style={{ color: '#d4a574' }}>
             Please connect at least one integration (Mailchimp, Notion, or GitHub) in Settings before creating campaigns.
           </AlertDescription>
         </Alert>
         <div className="mt-4">
-          <Button onClick={() => router.push('/settings')}>
+          <Button 
+            className="btn-magical"
+            style={{ background: 'linear-gradient(135deg, var(--wizard-gold) 0%, var(--wizard-gold-dark) 100%)', border: 'none', color: 'var(--thunder-dark)' }}
+            onClick={() => router.push('/settings')}
+          >
             Go to Settings
           </Button>
         </div>
@@ -201,13 +172,14 @@ export default function NewCampaignPage() {
         <Button
           variant="ghost"
           size="icon"
+          className="hover:bg-transparent hover:text-wizard-gold"
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">Create New Campaign</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold" style={{ color: '#fcd34d' }}>Create New Campaign</h1>
+          <p style={{ color: '#fbbf24' }}>
             Distribute your design across multiple channels
           </p>
         </div>
@@ -215,21 +187,21 @@ export default function NewCampaignPage() {
       
       <div className="grid gap-6">
         {selectedDesign && (
-          <Card>
+          <Card className="card-magical">
             <CardHeader>
-              <CardTitle>Selected Design</CardTitle>
-              <CardDescription>You selected this design for your campaign</CardDescription>
+              <CardTitle style={{ color: '#fcd34d' }}>Selected Design</CardTitle>
+              <CardDescription style={{ color: '#d4a574' }}>You selected this design for your campaign</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent style={{ background: 'transparent' }}>
               <div className="flex gap-4 items-start">
                 <img
                   src={selectedDesign.thumbnail?.url}
                   alt={selectedDesign.title}
-                  className="w-32 h-32 object-cover rounded-lg"
+                  className="w-32 h-32 object-cover rounded-lg magical-border"
                 />
                 <div>
-                  <h3 className="font-medium">{selectedDesign.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <h3 className="font-medium" style={{ color: '#fcd34d' }}>{selectedDesign.title}</h3>
+                  <p className="text-sm mt-1" style={{ color: '#d4a574' }}>
                     Design ID: {selectedDesign.id}
                   </p>
                 </div>
@@ -238,26 +210,26 @@ export default function NewCampaignPage() {
           </Card>
         )}
         
-        <Card>
+        <Card className="card-magical">
           <CardHeader>
-            <CardTitle>Campaign Details</CardTitle>
-            <CardDescription>Configure your campaign settings</CardDescription>
+            <CardTitle style={{ color: '#fcd34d' }}>Campaign Details</CardTitle>
+            <CardDescription style={{ color: '#d4a574' }}>Configure your campaign settings</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6" style={{ background: 'transparent' }}>
             <div>
-              <Label htmlFor="campaign-name">Campaign Name</Label>
+              <Label htmlFor="campaign-name" style={{ color: '#fcd34d' }}>Campaign Name</Label>
               <Input
                 id="campaign-name"
                 value={campaignName}
                 onChange={(e) => setCampaignName(e.target.value)}
                 placeholder="Enter campaign name"
-                className="mt-1"
+                className="mt-1 input-magical"
               />
             </div>
             
             <div className="space-y-3">
-              <Label>Distribution Channels</Label>
-              <p className="text-sm text-muted-foreground">
+              <Label style={{ color: '#fcd34d' }}>Distribution Channels</Label>
+              <p className="text-sm" style={{ color: '#d4a574' }}>
                 Select where you want to distribute your campaign
               </p>
               {availableChannels.map((channel) => {
@@ -268,10 +240,12 @@ export default function NewCampaignPage() {
                       id={channel.id}
                       checked={selectedChannels.includes(channel.id)}
                       onCheckedChange={() => handleChannelToggle(channel.id)}
+                      className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-yellow-600 data-[state=checked]:to-yellow-500 data-[state=checked]:border-yellow-500 border-gray-600"
                     />
                     <label
                       htmlFor={channel.id}
                       className="flex items-center gap-2 cursor-pointer"
+                      style={{ color: '#fbbf24' }}
                     >
                       <Icon className="h-4 w-4" />
                       {channel.name}
@@ -281,51 +255,29 @@ export default function NewCampaignPage() {
               })}
             </div>
             
-            {integrations.openai && selectedChannels.length > 0 && (
-              <div className="space-y-3">
-                <Label>AI Content Generation</Label>
-                <p className="text-sm text-muted-foreground">
-                  Generate optimized content for your campaign using AI
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={handleGenerateContent}
-                  disabled={isGeneratingContent || !selectedDesign}
-                >
-                  {isGeneratingContent ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    'Generate Content'
-                  )}
-                </Button>
-                {aiContent && (
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      AI content generated successfully! The content will be automatically applied when you create the campaign.
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-            )}
           </CardContent>
         </Card>
         
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => router.push('/dashboard')}>
+          <Button 
+            variant="outline" 
+            className="magical-border hover:bg-transparent hover:border-wizard-gold hover:text-wizard-gold"
+            style={{ color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.3)' }}
+            onClick={() => router.push('/dashboard')}
+          >
             Back to Dashboard
           </Button>
           <Button 
-            onClick={handleCreateCampaign} 
-            disabled={!selectedDesign || !campaignName || selectedChannels.length === 0 || isCreating}
+            className="btn-magical"
+            style={{ background: 'linear-gradient(135deg, var(--wizard-gold) 0%, var(--wizard-gold-dark) 100%)', border: 'none'}}
+            onClick={handleCustomizeCampaign} 
+            disabled={!selectedDesign || !campaignName || selectedChannels.length === 0}
           >
-            <Rocket className="w-4 h-4 mr-2" />
-            {isCreating ? "Creating..." : "Create Campaign"}
+            <Rocket className="w-4 h-4 mr-2 text-white" />
+            <span className='text-white'>Customize Campaign</span>
           </Button>
         </div>
+        
       </div>
     </div>
   )

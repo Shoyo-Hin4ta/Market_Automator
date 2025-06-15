@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/app/src/lib/supabase/server'
-import { getValidCanvaToken } from '@/app/src/lib/canva/token-manager'
-import { CanvaService } from '@/app/src/services/canva'
+import { createClient } from '@/app/lib/supabase/server'
+import { getValidCanvaToken } from '@/app/lib/canva/token-manager'
+import { CanvaService } from '@/app/services/canva'
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient()

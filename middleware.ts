@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import type { Database } from './app/src/lib/database.types'
+import type { Database } from './app/lib/database.types'
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -75,14 +75,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
   
-  // Redirect from root to appropriate page
-  if (pathname === '/') {
-    if (user) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    } else {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
-  }
+  // Remove the automatic redirect from root
+  // The landing page at / will be public
 
   return response
 }
