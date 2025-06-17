@@ -1,6 +1,7 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { NotionSection } from '@/app/components/settings/NotionSection'
@@ -15,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import '@/app/styles/magical-theme.css'
 import '@/app/styles/settings-overrides.css'
 
-export default function SettingsPage() {
+function SettingsPageContent() {
   const { integrations, loading } = useIntegrations()
   const searchParams = useSearchParams()
   const { toast } = useToast()
@@ -98,5 +99,18 @@ export default function SettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
+  )
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-full skeleton-magical" />
+        <Skeleton className="h-64 w-full skeleton-magical" />
+      </div>
+    }>
+      <SettingsPageContent />
+    </Suspense>
   )
 }

@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { Suspense, useState, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -36,7 +38,7 @@ interface CampaignForm {
   colorThemeDescription: string
 }
 
-export default function CustomizeCampaignPage() {
+function CustomizeCampaignPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const campaignName = searchParams.get('name') || ''
@@ -955,5 +957,17 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CustomizeCampaignPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen page-gradient flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+      </div>
+    }>
+      <CustomizeCampaignPageContent />
+    </Suspense>
   )
 }
