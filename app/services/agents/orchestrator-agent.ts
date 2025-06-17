@@ -47,6 +47,14 @@ export class OrchestratorAgent extends BaseAgent {
   
   async coordinateGeneration(context: AgentContext): Promise<GeneratedContent> {
     try {
+      // Log the context to ensure we have proper data
+      console.log('🎯 Orchestrator: Starting generation with context:', {
+        product: context.formData.product,
+        audience: context.formData.audience,
+        purpose: context.formData.purpose,
+        campaign: context.campaignName
+      });
+      
       // Step 1: Brand System Generation
       console.log('🎨 Brand Agent: Creating design system...');
       const brandSystem = await this.brandAgent.generateBrandSystem(context.formData);
@@ -57,6 +65,13 @@ export class OrchestratorAgent extends BaseAgent {
         context.formData,
         brandSystem
       );
+      
+      // Log content strategy to ensure specific content was generated
+      console.log('📝 Content Strategy headlines:', {
+        primary: contentStrategy.headlines.primary,
+        secondary: contentStrategy.headlines.secondary,
+        email: contentStrategy.headlines.email
+      });
       
       // Step 3: Technical Implementation
       console.log('🔧 Technical Agent: Building HTML templates...');

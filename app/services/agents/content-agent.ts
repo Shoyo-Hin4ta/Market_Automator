@@ -39,20 +39,30 @@ export class ContentAgent extends BaseAgent {
     formData: CampaignFormData,
     brandSystem: BrandSystem
   ): Promise<ContentStrategy> {
-    const prompt = `Create a comprehensive content strategy for:
-    Product: ${formData.product}
-    Audience: ${formData.audience}
-    Purpose: ${formData.purpose}
+    const prompt = `Create a comprehensive content strategy for this SPECIFIC product/service:
+    
+    CRITICAL: You MUST use these exact details in your content:
+    Product/Service: "${formData.product}"
+    Target Audience: "${formData.audience}"
+    Campaign Purpose: "${formData.purpose}"
     Tone: ${formData.tone}
     Visual Theme: ${formData.theme}
     
-    Generate:
-    1. Headlines (primary, secondary, email subject)
-    2. Body copy structure (intro, value props, benefits)
-    3. CTA variations based on ${formData.ctaEnabled ? formData.ctaText : 'no CTA needed'}
-    4. Tone guidelines matching ${formData.tone} style
+    Generate content that:
+    1. Headlines that specifically mention "${formData.product}" or directly reference what it does
+    2. Body copy that explains how "${formData.product}" helps "${formData.audience}"
+    3. Value propositions specific to "${formData.product}" - NO generic placeholders
+    4. Benefits that directly relate to "${formData.purpose}"
+    5. CTA variations based on ${formData.ctaEnabled ? `"${formData.ctaText}"` : 'no CTA needed'}
+    6. Tone guidelines matching ${formData.tone} style
     
-    Focus on emotional resonance and clear value communication.`;
+    IMPORTANT RULES:
+    - Never use generic phrases like "your product", "your service", "your solution"
+    - Always use the actual product name: "${formData.product}"
+    - Speak directly to "${formData.audience}" using their language
+    - Focus on achieving: "${formData.purpose}"
+    
+    Be specific, avoid generic marketing speak. Create content that could ONLY work for this product.`;
     
     return this.generateStructured(prompt, ContentStrategySchema);
   }

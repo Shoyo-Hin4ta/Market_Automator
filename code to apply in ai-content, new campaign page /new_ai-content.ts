@@ -59,7 +59,7 @@ export class AIContentService {
   // Agent 1: Conversation Analyst - Determines if we have enough info
   async analyzeConversation(messages: any[]): Promise<ConversationAnalysis> {
     const { text } = await generateText({
-      model: this.openai('gpt-4o-mini'),
+      model: this.openai('gpt-4o'),
       prompt: `You are a helpful marketing assistant analyzing a conversation to determine if we have enough information to create a campaign.
 
 Conversation:
@@ -112,7 +112,7 @@ Return ONLY the JSON object.`,
   // Agent 2: Color Palette Generator - Creates 5 color palette options based on user preference
   async generateColorPalettes(colorPreference: string, tone: string, style: string): Promise<ColorPalette[]> {
     const { text } = await generateText({
-      model: this.openai('gpt-4o-mini'),
+      model: this.openai('gpt-4o'),
       prompt: `You are a professional color theorist and designer creating color palettes for marketing campaigns.
 
 User's color preference: "${colorPreference}"
@@ -232,7 +232,7 @@ Return ONLY the JSON object with 5 unique, beautiful palettes.`,
   // Agent 3: Theme Builder - Creates complete theme with fonts based on selected palette
   async buildThemeFromPalette(palette: ColorPalette, style: string): Promise<ThemeConfig> {
     const { text } = await generateText({
-      model: this.openai('gpt-4o-mini'),
+      model: this.openai('gpt-4o'),
       prompt: `You are a design expert creating a complete theme configuration.
 
 Selected Color Palette:
@@ -319,7 +319,7 @@ Just type the number (1-5) of your preferred palette, and I'll use those colors 
     const analysis = await this.analyzeConversation(messages)
     
     const { text } = await generateText({
-      model: this.openai('gpt-4o-mini'),
+      model: this.openai('gpt-4o'),
       prompt: `Extract campaign context from this conversation.
 
 Conversation:
@@ -425,7 +425,7 @@ Return ONLY the JSON object, no markdown.`,
     const theme = context.emailTheme!
     
     const { text } = await generateText({
-      model: this.openai('gpt-4o-mini'),
+      model: this.openai('gpt-4o'),
       prompt: `You are a marketing expert creating an email campaign.
 
 User's Campaign Description: "${context.userDescription}"
@@ -514,7 +514,7 @@ Generate professional, themed email content that uses these exact colors through
     const theme = context.landingTheme!
     
     const { text } = await generateText({
-      model: this.openai('gpt-4o-mini'),
+      model: this.openai('gpt-4o'),
       prompt: `You are a web developer creating a landing page.
 
 User's Campaign Description: "${context.userDescription}"
@@ -615,7 +615,7 @@ Generate a high-converting, beautifully themed landing page using these exact co
   
   async refineContent(currentContent: string, instruction: string, type: 'email' | 'landing'): Promise<string> {
     const { text } = await generateText({
-      model: this.openai('gpt-4o-mini'),
+      model: this.openai('gpt-4o'),
       prompt: `Modify this ${type} HTML based on the user's instruction.
 
 Current HTML:

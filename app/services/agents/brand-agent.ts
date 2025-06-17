@@ -93,8 +93,37 @@ export class BrandAgent extends BaseAgent {
     return this.generateStructured(prompt, BrandSystemSchema);
   }
   
-  async generateColorPalette(formData: Partial<CampaignFormData>): Promise<ColorSelection> {
-    const prompt = `Generate a professional color palette for:
+  async generateColorPalette(formData: Partial<CampaignFormData>, colorThemeDescription?: string): Promise<ColorSelection> {
+    let prompt = '';
+    
+    if (colorThemeDescription) {
+      // Use the user's color theme description
+      prompt = `Generate a professional color palette based on this description: "${colorThemeDescription}"
+    
+    Context:
+    Product: ${formData.product}
+    Audience: ${formData.audience}
+    Purpose: ${formData.purpose}
+    Tone: ${formData.tone}
+    Theme: ${formData.theme}
+    
+    Create a cohesive color palette that:
+    1. Matches the user's color theme description: "${colorThemeDescription}"
+    2. Works well with the ${formData.theme} theme aesthetic
+    3. Appeals to ${formData.audience}
+    4. Conveys a ${formData.tone} tone
+    
+    Rules:
+    - Primary: Main brand color based on the description
+    - Secondary: Complements primary, used for accents and variation
+    - Accent: High contrast color for CTAs and important elements
+    - Background: Light color for main background (usually light gray or off-white)
+    - Text: Dark color for body text with excellent readability
+    
+    Return hex color values only.`;
+    } else {
+      // AI decides based on context alone
+      prompt = `Generate a professional color palette for:
     Product: ${formData.product}
     Audience: ${formData.audience}
     Purpose: ${formData.purpose}
@@ -115,6 +144,7 @@ export class BrandAgent extends BaseAgent {
     - Text: Dark color for body text with excellent readability
     
     Return hex color values only.`;
+    }
     
     return this.generateStructured(prompt, ColorSelectionSchema);
   }

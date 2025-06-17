@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Loader2, Send, Rocket, Sparkles, ArrowLeft, ArrowRight, Palette } from 'lucide-react'
-import { useToast } from '@/app/src/hooks/use-toast'
+import { useToast } from '@/app/hooks/use-toast'
 import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 

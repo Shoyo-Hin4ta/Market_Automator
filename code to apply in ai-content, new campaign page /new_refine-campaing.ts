@@ -1,5 +1,5 @@
-import { createClient } from '@/app/src/lib/supabase/server'
-import { AIContentService } from '@/app/src/services/ai-content'
+import { createClient } from '@/app/lib/supabase/server'
+import { AIContentService } from '@/app/services/ai-content'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {

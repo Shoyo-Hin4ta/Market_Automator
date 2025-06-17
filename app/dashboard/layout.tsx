@@ -2,7 +2,8 @@
 
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { BarChart3, Sparkles, Settings } from 'lucide-react'
+import { BarChart3, Sparkles, Settings, LogOut } from 'lucide-react'
+import { useAuth } from '@/app/contexts/AuthContext'
 import '@/app/styles/magical-theme.css'
 
 export default function DashboardLayout({
@@ -11,6 +12,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const { signOut } = useAuth()
   
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0827 30%, #0f0517 70%, #0a0a0a 100%)' }}>
@@ -39,6 +41,14 @@ export default function DashboardLayout({
                 onClick={() => router.push('/settings')}
               >
                 <Settings className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                className="hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all"
+                onClick={signOut}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
               </Button>
             </div>
           </div>

@@ -13,7 +13,7 @@ import { Loader2, Send, Rocket, Sparkles, ArrowLeft, ArrowRight } from 'lucide-r
 import { useToast } from '@/app/hooks/use-toast'
 import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import '../@/app/magical-theme.css'
+import '@/app/styles/magical-theme.css'
 
 interface CampaignForm {
   product: string
@@ -32,6 +32,8 @@ interface CampaignForm {
     text: string
   }
   aiDecideColors: boolean
+  colorMode: 'ai' | 'describe' | 'manual'
+  colorThemeDescription: string
 }
 
 export default function CustomizeCampaignPage() {
@@ -97,7 +99,9 @@ export default function CustomizeCampaignPage() {
       background: '#F3F4F6',
       text: '#111827'
     },
-    aiDecideColors: false
+    aiDecideColors: false,
+    colorMode: 'manual',
+    colorThemeDescription: ''
   })
   
   // Chat state
@@ -133,6 +137,15 @@ export default function CustomizeCampaignPage() {
       return
     }
     
+    if (formData.colorMode === 'describe' && !formData.colorThemeDescription.trim()) {
+      toast({
+        title: 'Missing color theme',
+        description: 'Please describe your desired color theme',
+        variant: 'destructive'
+      })
+      return
+    }
+    
     if (formData.ctaEnabled && !formData.ctaLink) {
       toast({
         title: 'Missing CTA link',
@@ -147,11 +160,20 @@ export default function CustomizeCampaignPage() {
     setIsGenerating(true)
     
     // Create initial message from form data
+    let colorInstruction = '';
+    if (formData.colorMode === 'ai') {
+      colorInstruction = 'Please select appropriate colors that match this campaign.';
+    } else if (formData.colorMode === 'describe') {
+      colorInstruction = `Please create a color palette based on this theme: ${formData.colorThemeDescription}.`;
+    } else {
+      colorInstruction = `Use these colors: Primary: ${formData.selectedColors.primary}, Secondary: ${formData.selectedColors.secondary}, Accent: ${formData.selectedColors.accent}.`;
+    }
+    
     const formDescription = `I want to create a campaign for ${formData.product}. 
 My target audience is ${formData.audience}. 
 The purpose of this campaign is ${formData.purpose}.
 I want a ${formData.tone} tone with a ${formData.theme} theme.
-${formData.aiDecideColors ? 'Please select appropriate colors that match this campaign.' : `Use these colors: Primary: ${formData.selectedColors.primary}, Secondary: ${formData.selectedColors.secondary}, Accent: ${formData.selectedColors.accent}.`}
+${colorInstruction}
 ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to ${formData.ctaLink}` : 'No CTA buttons needed.'}`
     
     setMessages([
@@ -171,9 +193,11 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
           currentLanding: '',
           selectedChannels,
           skipAnalysis: true, // Skip the analysis since we have all info from form
-          selectedColors: formData.aiDecideColors ? undefined : formData.selectedColors,
+          selectedColors: formData.colorMode === 'manual' ? formData.selectedColors : undefined,
           themeStyle: formData.theme,
-          aiDecideColors: formData.aiDecideColors
+          aiDecideColors: formData.colorMode === 'ai',
+          colorMode: formData.colorMode,
+          colorThemeDescription: formData.colorThemeDescription
         })
       })
       
@@ -190,7 +214,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
         setFormData(prev => ({
           ...prev,
           selectedColors: data.generatedColors,
-          aiDecideColors: false // Turn off AI Decide after generation
+          colorMode: 'manual' // Switch to manual mode after generation to show the colors
         }))
       }
       
@@ -430,21 +454,93 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
               
               {/* Color Selection Section */}
               <div className="space-y-4 border rounded-lg p-4 magical-border">
-                <div className="flex items-center justify-between mb-4">
-                  <Label className="text-gray-300">Brand Colors</Label>
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="ai-decide-colors" className="text-sm text-gray-400 cursor-pointer">
-                      AI Decide
-                    </Label>
-                    <Switch
-                      id="ai-decide-colors"
-                      checked={formData.aiDecideColors}
-                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, aiDecideColors: checked }))}
-                      className="magical-switch"
-                    />
+                <div className="mb-4">
+                  <Label className="text-gray-300 mb-3 block">Brand Colors</Label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <div className="relative">
+                        <input
+                          type="radio"
+                          name="colorMode"
+                          value="ai"
+                          checked={formData.colorMode === 'ai'}
+                          onChange={() => setFormData(prev => ({ ...prev, colorMode: 'ai', aiDecideColors: true }))}
+                          className="sr-only"
+                        />
+                        <div className={`w-4 h-4 rounded-full border transition-all ${
+                          formData.colorMode === 'ai' 
+                            ? 'border-yellow-500 bg-yellow-500/20' 
+                            : 'border-gray-600 bg-transparent'
+                        }`}>
+                          {formData.colorMode === 'ai' && (
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-300 group-hover:text-yellow-500 transition-colors">Let AI Decide</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <div className="relative">
+                        <input
+                          type="radio"
+                          name="colorMode"
+                          value="describe"
+                          checked={formData.colorMode === 'describe'}
+                          onChange={() => setFormData(prev => ({ ...prev, colorMode: 'describe', aiDecideColors: false }))}
+                          className="sr-only"
+                        />
+                        <div className={`w-4 h-4 rounded-full border transition-all ${
+                          formData.colorMode === 'describe' 
+                            ? 'border-yellow-500 bg-yellow-500/20' 
+                            : 'border-gray-600 bg-transparent'
+                        }`}>
+                          {formData.colorMode === 'describe' && (
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-300 group-hover:text-yellow-500 transition-colors">Describe Theme</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <div className="relative">
+                        <input
+                          type="radio"
+                          name="colorMode"
+                          value="manual"
+                          checked={formData.colorMode === 'manual'}
+                          onChange={() => setFormData(prev => ({ ...prev, colorMode: 'manual', aiDecideColors: false }))}
+                          className="sr-only"
+                        />
+                        <div className={`w-4 h-4 rounded-full border transition-all ${
+                          formData.colorMode === 'manual' 
+                            ? 'border-yellow-500 bg-yellow-500/20' 
+                            : 'border-gray-600 bg-transparent'
+                        }`}>
+                          {formData.colorMode === 'manual' && (
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-300 group-hover:text-yellow-500 transition-colors">Choose Colors</span>
+                    </label>
                   </div>
                 </div>
-                <div className={`grid grid-cols-2 gap-4 ${formData.aiDecideColors ? 'opacity-50 pointer-events-none' : ''}`}>
+                
+                {/* Color Theme Description Input */}
+                {formData.colorMode === 'describe' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="color-theme" className="text-sm text-gray-400">Describe your color theme</Label>
+                    <Input
+                      id="color-theme"
+                      placeholder="e.g., warm sunset tones, corporate blue and gray, vibrant red and orange"
+                      value={formData.colorThemeDescription}
+                      onChange={(e) => setFormData(prev => ({ ...prev, colorThemeDescription: e.target.value }))}
+                      className="input-magical"
+                    />
+                  </div>
+                )}
+                
+                <div className={`grid grid-cols-2 gap-4 ${formData.colorMode !== 'manual' ? 'opacity-50 pointer-events-none' : ''}`}>
                   <div className="space-y-2">
                     <Label className="text-sm text-gray-400">Primary Color</Label>
                     <div className="flex items-center gap-2">
@@ -465,7 +561,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
                           selectedColors: { ...prev.selectedColors, primary: e.target.value }
                         }))}
                         className="sr-only"
-                        disabled={formData.aiDecideColors}
+                        disabled={formData.colorMode !== 'manual'}
                       />
                       <Input
                         value={formData.selectedColors.primary}
@@ -475,7 +571,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
                         }))}
                         placeholder="#3B82F6"
                         className="input-magical"
-                        disabled={formData.aiDecideColors}
+                        disabled={formData.colorMode !== 'manual'}
                       />
                     </div>
                   </div>
@@ -500,7 +596,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
                           selectedColors: { ...prev.selectedColors, secondary: e.target.value }
                         }))}
                         className="sr-only"
-                        disabled={formData.aiDecideColors}
+                        disabled={formData.colorMode !== 'manual'}
                       />
                       <Input
                         value={formData.selectedColors.secondary}
@@ -510,7 +606,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
                         }))}
                         placeholder="#8B5CF6"
                         className="input-magical"
-                        disabled={formData.aiDecideColors}
+                        disabled={formData.colorMode !== 'manual'}
                       />
                     </div>
                   </div>
@@ -535,7 +631,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
                           selectedColors: { ...prev.selectedColors, accent: e.target.value }
                         }))}
                         className="sr-only"
-                        disabled={formData.aiDecideColors}
+                        disabled={formData.colorMode !== 'manual'}
                       />
                       <Input
                         value={formData.selectedColors.accent}
@@ -545,7 +641,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
                         }))}
                         placeholder="#F59E0B"
                         className="input-magical"
-                        disabled={formData.aiDecideColors}
+                        disabled={formData.colorMode !== 'manual'}
                       />
                     </div>
                   </div>
@@ -570,7 +666,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
                           selectedColors: { ...prev.selectedColors, background: e.target.value }
                         }))}
                         className="sr-only"
-                        disabled={formData.aiDecideColors}
+                        disabled={formData.colorMode !== 'manual'}
                       />
                       <Input
                         value={formData.selectedColors.background}
@@ -580,7 +676,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
                         }))}
                         placeholder="#F3F4F6"
                         className="input-magical"
-                        disabled={formData.aiDecideColors}
+                        disabled={formData.colorMode !== 'manual'}
                       />
                     </div>
                   </div>
@@ -605,7 +701,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
                           selectedColors: { ...prev.selectedColors, text: e.target.value }
                         }))}
                         className="sr-only"
-                        disabled={formData.aiDecideColors}
+                        disabled={formData.colorMode !== 'manual'}
                       />
                       <Input
                         value={formData.selectedColors.text}
@@ -615,7 +711,7 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
                         }))}
                         placeholder="#111827"
                         className="input-magical"
-                        disabled={formData.aiDecideColors}
+                        disabled={formData.colorMode !== 'manual'}
                       />
                     </div>
                   </div>
@@ -710,8 +806,8 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
               </>
             ) : (
               <>
-                <Rocket className="h-4 w-4 mr-2" />
-                Launch Campaign
+                <Rocket className="h-4 w-4 mr-2 text-white" />
+                <span className='text-white'>Launch Campaign</span>
               </>
             )}
           </Button>

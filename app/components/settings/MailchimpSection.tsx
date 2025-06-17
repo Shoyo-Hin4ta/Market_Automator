@@ -7,13 +7,7 @@ import { Mail } from 'lucide-react'
 import { BaseIntegrationSection } from './BaseIntegrationSection'
 import { TestConnection } from './TestConnection'
 import { useToast } from '../../hooks/use-toast'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { CustomDropdown } from '@/app/components/ui/CustomDropdown'
 
 interface MailchimpAudience {
   id: string
@@ -194,18 +188,16 @@ export function MailchimpSection() {
         {showAudienceSelect && audiences.length > 0 && !isConnected && (
           <div className="space-y-2">
             <Label htmlFor="audience-select">Select Audience</Label>
-            <Select value={selectedAudience} onValueChange={setSelectedAudience}>
-              <SelectTrigger id="audience-select">
-                <SelectValue placeholder="Choose an audience" />
-              </SelectTrigger>
-              <SelectContent>
-                {audiences.map((audience) => (
-                  <SelectItem key={audience.id} value={audience.id}>
-                    {audience.name} ({audience.stats.member_count} members)
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CustomDropdown
+              value={selectedAudience}
+              onValueChange={setSelectedAudience}
+              options={audiences.map((audience) => ({
+                value: audience.id,
+                label: `${audience.name} (${audience.stats.member_count} members)`
+              }))}
+              placeholder="Choose an audience"
+              width="100%"
+            />
           </div>
         )}
         

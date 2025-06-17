@@ -140,7 +140,7 @@ export default function RegisterPage() {
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-              <Button type="submit" className="w-full btn-magical" style={{ background: loading ? undefined : 'linear-gradient(135deg, var(--wizard-gold) 0%, var(--wizard-gold-dark) 100%)', border: 'none', color: 'white' }} disabled={loading}>
+              <Button type="submit" className="w-full font-bold" style={{ backgroundColor: loading ? '#9ca3af' : '#fcd34d', backgroundImage: loading ? 'none' : 'linear-gradient(to right, #ca8a04, #eab308)', border: 'none', color: 'white' }} disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

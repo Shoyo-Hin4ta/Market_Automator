@@ -32,19 +32,18 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json({ authUrl })
   
   // Store verifier and state in cookies for callback
-  response.cookies.set('canva_code_verifier', codeVerifier, {
+  const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 600 // 10 minutes
-  })
+    sameSite: 'lax' as const,
+    maxAge: 600, // 10 minutes
+    path: '/',
+    // In development, explicitly set domain to ensure cookies work across 127.0.0.1
+    ...(process.env.NODE_ENV === 'development' && { domain: '127.0.0.1' })
+  }
   
-  response.cookies.set('canva_state', state, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 600
-  })
+  response.cookies.set('canva_code_verifier', codeVerifier, cookieOptions)
+  response.cookies.set('canva_state', state, cookieOptions)
   
   return response
 }

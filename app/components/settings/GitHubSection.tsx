@@ -255,7 +255,13 @@ export function GitHubSection() {
               <Button
                 onClick={handleGenerateTestPage}
                 disabled={isGenerating}
-                variant="outline"
+                className="font-bold"
+                style={{ 
+                  backgroundColor: isGenerating ? '#9ca3af' : '#fcd34d', 
+                  backgroundImage: isGenerating ? 'none' : 'linear-gradient(to right, #ca8a04, #eab308)', 
+                  border: 'none', 
+                  color: 'var(--wizard-gold)' 
+                }}
               >
                 {isGenerating ? (
                   <>

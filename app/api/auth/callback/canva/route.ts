@@ -9,24 +9,28 @@ export async function GET(request: NextRequest) {
   const error = searchParams.get('error')
   
   // Handle OAuth errors
+  const baseUrl = process.env.NODE_ENV === 'development' 
+    ? 'http://127.0.0.1:3000' 
+    : request.url.split('/api')[0]
+    
   if (error) {
-    return NextResponse.redirect(new URL('/settings?tab=canva&error=oauth_denied', request.url))
+    return NextResponse.redirect(new URL('/settings?tab=canva&error=oauth_denied', baseUrl))
   }
   
   if (!code || !state) {
-    return NextResponse.redirect(new URL('/settings?tab=canva&error=missing_params', request.url))
+    return NextResponse.redirect(new URL('/settings?tab=canva&error=missing_params', baseUrl))
   }
   
   // Verify state
   const storedState = request.cookies.get('canva_state')?.value
   if (state !== storedState) {
-    return NextResponse.redirect(new URL('/settings?tab=canva&error=invalid_state', request.url))
+    return NextResponse.redirect(new URL('/settings?tab=canva&error=invalid_state', baseUrl))
   }
   
   // Get code verifier
   const codeVerifier = request.cookies.get('canva_code_verifier')?.value
   if (!codeVerifier) {
-    return NextResponse.redirect(new URL('/settings?tab=canva&error=missing_verifier', request.url))
+    return NextResponse.redirect(new URL('/settings?tab=canva&error=missing_verifier', baseUrl))
   }
   
   try {
@@ -71,7 +75,7 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      return NextResponse.redirect(new URL('/login', baseUrl))
     }
     
     // Store unencrypted following established pattern
@@ -88,13 +92,20 @@ export async function GET(request: NextRequest) {
     })
     
     // Clear cookies and redirect
-    const response = NextResponse.redirect(new URL('/settings?tab=canva&success=true', request.url))
-    response.cookies.delete('canva_code_verifier')
-    response.cookies.delete('canva_state')
+    const response = NextResponse.redirect(new URL('/settings?tab=canva&success=true', baseUrl))
+    
+    // Delete cookies with same options to ensure they're properly cleared
+    const deleteOptions = {
+      path: '/',
+      ...(process.env.NODE_ENV === 'development' && { domain: '127.0.0.1' })
+    }
+    
+    response.cookies.delete('canva_code_verifier', deleteOptions)
+    response.cookies.delete('canva_state', deleteOptions)
     
     return response
   } catch (error) {
     console.error('OAuth callback error:', error)
-    return NextResponse.redirect(new URL('/settings?tab=canva&error=callback_failed', request.url))
+    return NextResponse.redirect(new URL('/settings?tab=canva&error=callback_failed', baseUrl))
   }
 }

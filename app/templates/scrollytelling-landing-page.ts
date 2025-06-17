@@ -167,19 +167,20 @@ export const generateScrollytellingLandingPage = (
             background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/Scenario2.jpeg') center/cover;
         }
 
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
+        .flow-diagram-container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .feature-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            padding: 2rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
+        .flow-diagram {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 20px rgba(96, 165, 250, 0.3));
         }
 
         /* Distribution Section */
@@ -293,24 +294,175 @@ export const generateScrollytellingLandingPage = (
         </div>
     </section>
 
-    <!-- Section 2: The Transformation -->
+    <!-- Section 2: The Flow -->
     <section class="section transformation">
         <div class="content-wrapper">
-            <h2 class="section-title">${content.transformation.title}</h2>
-            <p class="section-description">${content.transformation.description}</p>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <h3>✨ AI Magic</h3>
-                    <p>Content that resonates with your audience</p>
-                </div>
-                <div class="feature-card">
-                    <h3>🎨 Design Alchemy</h3>
-                    <p>Transform static designs into dynamic experiences</p>
-                </div>
-                <div class="feature-card">
-                    <h3>🌐 Multi-Channel</h3>
-                    <p>Deploy everywhere with one click</p>
-                </div>
+            <h2 class="section-title">The Marketing Magic Flow</h2>
+            <p class="section-description">See how your designs transform into powerful campaigns</p>
+            <div class="flow-diagram-container">
+                <svg viewBox="0 0 800 600" class="flow-diagram" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Definitions for gradients and filters -->
+                    <defs>
+                        <!-- Lightning gradient -->
+                        <linearGradient id="lightning-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#60A5FA" stop-opacity="1">
+                                <animate attributeName="stop-color" values="#60A5FA;#A78BFA;#60A5FA" dur="3s" repeatCount="indefinite" />
+                            </stop>
+                            <stop offset="100%" stop-color="#A78BFA" stop-opacity="1">
+                                <animate attributeName="stop-color" values="#A78BFA;#60A5FA;#A78BFA" dur="3s" repeatCount="indefinite" />
+                            </stop>
+                        </linearGradient>
+
+                        <!-- Glow filter -->
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+
+                        <!-- Electric pulse filter -->
+                        <filter id="electric-glow">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1" />
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur2" />
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur3" />
+                            <feMerge>
+                                <feMergeNode in="blur3" />
+                                <feMergeNode in="blur2" />
+                                <feMergeNode in="blur1" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Canva Box -->
+                    <g transform="translate(250, 50)">
+                        <rect x="0" y="0" width="300" height="80" rx="16" fill="rgba(0,0,0,0.5)" stroke="url(#lightning-gradient)" stroke-width="2" filter="url(#glow)" />
+                        <text x="150" y="50" font-size="32" font-family="Arial, sans-serif" fill="#00C4CC" text-anchor="middle" font-weight="bold">Canva</text>
+                    </g>
+
+                    <!-- Lightning Arrow from Canva to OpenAI -->
+                    <path
+                        d="M 400 130 
+                           L 380 170 
+                           L 390 170 
+                           L 370 210
+                           L 380 210
+                           L 360 250
+                           L 400 220
+                           L 410 220
+                           L 420 190
+                           L 430 190
+                           L 410 170
+                           L 420 170
+                           Z"
+                        fill="url(#lightning-gradient)"
+                        filter="url(#electric-glow)"
+                        opacity="0.9"
+                    >
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" />
+                    </path>
+
+                    <!-- OpenAI Box -->
+                    <g transform="translate(250, 250)">
+                        <rect x="0" y="0" width="300" height="80" rx="16" fill="rgba(0,0,0,0.5)" stroke="url(#lightning-gradient)" stroke-width="2" filter="url(#glow)" />
+                        <text x="150" y="50" font-size="28" font-family="Arial, sans-serif" fill="#10A37F" text-anchor="middle" font-weight="bold">OpenAI</text>
+                    </g>
+
+                    <!-- Triple Lightning Split -->
+                    <!-- Left Lightning to Mailchimp -->
+                    <path
+                        d="M 300 330
+                           L 280 360
+                           L 290 360
+                           L 270 390
+                           L 280 390
+                           L 250 430
+                           L 280 410
+                           L 290 410
+                           L 300 380
+                           L 310 380
+                           L 300 360
+                           L 310 360
+                           Z"
+                        fill="url(#lightning-gradient)"
+                        filter="url(#electric-glow)"
+                        opacity="0.9"
+                    >
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" begin="0.5s" repeatCount="indefinite" />
+                    </path>
+
+                    <!-- Center Lightning to GitHub -->
+                    <path
+                        d="M 400 330
+                           L 385 370
+                           L 395 370
+                           L 380 410
+                           L 390 410
+                           L 375 450
+                           L 400 420
+                           L 410 420
+                           L 420 390
+                           L 430 390
+                           L 415 370
+                           L 425 370
+                           Z"
+                        fill="url(#lightning-gradient)"
+                        filter="url(#electric-glow)"
+                        opacity="0.9"
+                    >
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" begin="0.25s" repeatCount="indefinite" />
+                    </path>
+
+                    <!-- Right Lightning to Notion -->
+                    <path
+                        d="M 500 330
+                           L 490 360
+                           L 500 360
+                           L 490 390
+                           L 500 390
+                           L 480 430
+                           L 510 410
+                           L 520 410
+                           L 530 380
+                           L 540 380
+                           L 520 360
+                           L 530 360
+                           Z"
+                        fill="url(#lightning-gradient)"
+                        filter="url(#electric-glow)"
+                        opacity="0.9"
+                    >
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" begin="0.75s" repeatCount="indefinite" />
+                    </path>
+
+                    <!-- Mailchimp Box -->
+                    <g transform="translate(100, 450)">
+                        <rect x="0" y="0" width="200" height="80" rx="16" fill="rgba(0,0,0,0.5)" stroke="url(#lightning-gradient)" stroke-width="2" filter="url(#glow)" />
+                        <text x="100" y="50" font-size="24" font-family="Arial, sans-serif" fill="#FFE01B" text-anchor="middle" font-weight="bold">Mailchimp</text>
+                    </g>
+
+                    <!-- GitHub Box -->
+                    <g transform="translate(300, 450)">
+                        <rect x="0" y="0" width="200" height="80" rx="16" fill="rgba(0,0,0,0.5)" stroke="url(#lightning-gradient)" stroke-width="2" filter="url(#glow)" />
+                        <text x="100" y="50" font-size="24" font-family="Arial, sans-serif" fill="#FFFFFF" text-anchor="middle" font-weight="bold">GitHub</text>
+                    </g>
+
+                    <!-- Notion Box -->
+                    <g transform="translate(500, 450)">
+                        <rect x="0" y="0" width="200" height="80" rx="16" fill="rgba(0,0,0,0.5)" stroke="url(#lightning-gradient)" stroke-width="2" filter="url(#glow)" />
+                        <text x="100" y="50" font-size="24" font-family="Arial, sans-serif" fill="#FFFFFF" text-anchor="middle" font-weight="bold">Notion</text>
+                    </g>
+
+                    <!-- Animated energy rings -->
+                    <g transform="translate(400, 290)">
+                        <circle r="40" fill="none" stroke="url(#lightning-gradient)" stroke-width="1" opacity="0">
+                            <animate attributeName="r" values="0;60" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="1;0" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                    </g>
+                </svg>
             </div>
         </div>
     </section>
@@ -383,18 +535,17 @@ export const generateScrollytellingLandingPage = (
             });
         });
 
-        // Feature cards stagger animation
-        ScrollTrigger.batch(".feature-card", {
-            onEnter: elements => {
-                gsap.from(elements, {
-                    opacity: 0,
-                    y: 100,
-                    stagger: 0.15,
-                    duration: 1,
-                    ease: "power3.out"
-                });
-            },
-            start: "top 85%"
+        // Flow diagram animation
+        gsap.from(".flow-diagram-container", {
+            opacity: 0,
+            scale: 0.8,
+            duration: 1.5,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: ".flow-diagram-container",
+                start: "top 80%",
+                toggleActions: "play none none reverse"
+            }
         });
 
         // Platform icons animation

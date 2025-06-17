@@ -88,7 +88,11 @@ export function TestConnection({
         onClick={handleSave}
         disabled={!canSave || !tested || !success || saving || disabled}
         className="ml-auto btn-magical"
-        style={{ background: (!canSave || !tested || !success || saving || disabled) ? undefined : 'linear-gradient(135deg, var(--wizard-gold) 0%, var(--wizard-gold-dark) 100%)', border: 'none', color: 'white' }}
+        style={{ 
+          background: (!canSave || !tested || !success || saving || disabled) ? undefined : 'linear-gradient(135deg, var(--wizard-gold) 0%, var(--wizard-gold-dark) 100%)', 
+          border: 'none', 
+          color: 'var(--wizard-gold)'
+        }}
       >
         {saving ? (
           <>

@@ -80,7 +80,16 @@ export function CanvaSection() {
             <p className="text-sm mb-4 text-magical-secondary">
               Connect your Canva account to access your designs
             </p>
-            <Button onClick={handleConnect} disabled={isLoading}>
+            <Button 
+              onClick={handleConnect} 
+              disabled={isLoading}
+              variant="outline"
+              className="btn-magical"
+              style={{ 
+                borderColor: 'var(--wizard-gold)', 
+                color: 'var(--wizard-gold)' 
+              }}
+            >
               Connect Canva Account
             </Button>
           </div>
@@ -94,7 +103,15 @@ export function CanvaSection() {
                 </p>
               )}
             </div>
-            <Button variant="destructive" onClick={handleDisconnect}>
+            <Button 
+              variant="outline" 
+              onClick={handleDisconnect}
+              className="btn-magical"
+              style={{ 
+                borderColor: 'var(--wizard-gold)', 
+                color: 'var(--wizard-gold)' 
+              }}
+            >
               Disconnect
             </Button>
           </div>

@@ -1,130 +1,172 @@
 # Marketing Automator
 
-A comprehensive marketing automation platform that integrates Canva, Notion, GitHub, Mailchimp, and OpenAI to streamline campaign creation and distribution.
+![Marketing Automator Flow](./public/Flow.png)
 
-## 🎨 Latest Updates
+## What is Marketing Automator?
 
-### AI-Powered Campaign Customization
-- **Interactive Color Palettes**: Describe your brand colors in natural language and get 4 AI-generated palette options
-- **Conversational Content Generation**: Chat with AI to refine your campaign content in real-time
-- **Template Selection**: Choose between standard landing pages or immersive scrollytelling experiences
-- **Form-First Approach**: Structured campaign setup with intelligent AI assistance
+Marketing Automator is a platform that connects your favorite design and marketing tools to create professional campaigns in minutes. Simply pick a design from Canva, describe your campaign, and let our AI agents handle the rest - from writing compelling copy to building beautiful landing pages and sending emails.
 
-### Enhanced Navigation & UX
-- **Improved Navigation**: Seamless flow between Dashboard, Campaigns, and Settings
-- **GitHub Integration**: Automatic GitHub Pages deployment with clear status indicators
-- **Notion Sync**: Campaign data automatically syncs to your Notion database including GitHub URLs
+Perfect for small businesses, marketers, and anyone who wants to create professional marketing campaigns without the hassle of juggling multiple tools.
 
-## Features
+## 🚀 Setting Up Locally
 
-- **Multi-Service Integration**: Connect Canva, Notion, GitHub, Mailchimp, and OpenAI in one platform
-- **Smart Design Management**: Browse and organize Canva designs with dimension-based grouping
-- **Automated Campaign Creation**: Generate marketing campaigns from Canva designs with AI
-- **AI-Powered Content**: Use OpenAI to generate optimized email and landing page content with interactive refinement
-- **Multi-Channel Distribution**: Distribute campaigns to email, Notion databases, and GitHub Pages
-- **Campaign Analytics**: Track email performance with detailed metrics and real-time sync
-- **Advanced Filtering**: Category filters for Social Media, Presentations, Videos, and more
-- **Secure Authentication**: Built on Supabase with row-level security
-- **Modern UI**: Clean, responsive interface built with Next.js and Shadcn UI
-- **Scrollytelling Landing Pages**: Create immersive, animated landing pages with GSAP animations
+### Prerequisites
+- Node.js 18.x or higher
+- npm 9.x or higher
+- Git
 
-## Tech Stack
+### Step 1: Clone and Install
+```bash
+git clone https://github.com/yourusername/market-automator.git
+cd market-automator
+npm install
 
-- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
-- **UI Components**: Shadcn UI
-- **Backend**: Supabase (Auth & Database)
-- **AI**: OpenAI GPT-4 via Vercel AI SDK
-- **Integrations**: Canva OAuth 2.0, Notion API, GitHub API, Mailchimp API v3
-
-## Getting Started
-
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install --legacy-peer-deps
-   ```
-
-3. Set up environment variables in `.env.local`:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   
-   NEXT_PUBLIC_CANVA_CLIENT_ID=your-canva-client-id
-   CANVA_CLIENT_SECRET=your-canva-secret
-   CANVA_REDIRECT_URI=http://127.0.0.1:3000/api/auth/callback/canva
-   
-   NEXT_PUBLIC_APP_URL=http://127.0.0.1:3000
-   ```
-
-4. Run database migrations:
-   ```bash
-   npx supabase db push
-   ```
-
-5. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-6. Open [http://127.0.0.1:3000](http://127.0.0.1:3000) (use 127.0.0.1, not localhost)
-
-## Usage
-
-1. **Register/Login**: Create an account or sign in
-2. **Connect Services**: Go to Settings and connect your integrations:
-   - Notion: Add your Integration Token
-   - GitHub: Add username and Personal Access Token
-   - Mailchimp: Add API key and server prefix
-   - OpenAI: Add your API key
-   - Canva: Connect via OAuth
-3. **Browse Designs**: Navigate to the Dashboard to view your Canva designs:
-   - Designs are automatically grouped by dimensions (Square, Portrait, Landscape, etc.)
-   - Use category filters to find specific design types
-   - Search by design name or switch between grid/list views
-4. **Create Campaigns**: Select any design and click "Distribute Campaign":
-   - Fill out campaign details (product, audience, purpose)
-   - Choose between standard or scrollytelling landing page templates
-   - Describe your color preferences and select from AI-generated palettes
-   - Chat with AI to refine your content until perfect
-   - Select distribution channels (Email, Notion, GitHub)
-5. **Track Performance**: Monitor campaigns in the Analytics page:
-   - View all campaigns with status and channel badges
-   - Send emails directly from the platform
-   - Sync real-time analytics from Mailchimp
-   - See detailed metrics including open rates, click rates, and more
-   - Navigate easily between Dashboard, Campaigns, and Campaign Details
-
-## Project Structure
-
-```
-/app              # Next.js App Router pages
-/app/src          # Source code
-  /components     # UI components
-    /dashboard    # Dashboard-specific components
-    /settings     # Settings page components
-    /campaigns    # Campaign analytics components
-  /contexts       # React contexts
-  /hooks          # Custom hooks
-  /lib            # Utilities and configs
-    /constants    # App constants and categories
-    /utils        # Helper functions
-    /ai           # AI prompt templates
-    /canva        # Canva OAuth config
-  /services       # API service layers
-  /types          # TypeScript type definitions
-/supabase         # Database migrations
-/components       # Shadcn UI components
-/api              # API routes for integrations
+# If you encounter Tailwind errors:
+npm rebuild
 ```
 
-## Security
+### Step 2: Create a Supabase Project
+1. Sign up at [Supabase](https://supabase.com)
+2. Create a new project
+3. Save your project URL and keys
 
-- All API keys are stored securely in Supabase
-- Row Level Security (RLS) enabled on all tables
-- OAuth 2.0 with PKCE for Canva integration
-- Server-side only API calls
+### Step 3: Set Up Your Database
+```bash
+# Install Supabase CLI
+npm install -g supabase
 
-## License
+# Initialize Supabase
+supabase init
 
-MIT
+# Link to your project
+supabase link --project-ref your-project-ref
+
+# Run migrations
+supabase db push
+```
+
+### Step 4: Configure Environment
+Create a `.env.local` file:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Canva OAuth
+NEXT_PUBLIC_CANVA_CLIENT_ID=your-canva-client-id
+CANVA_CLIENT_SECRET=your-canva-client-secret
+CANVA_REDIRECT_URI=http://127.0.0.1:3000/api/auth/callback/canva
+
+# App URL - MUST use 127.0.0.1
+NEXT_PUBLIC_APP_URL=http://127.0.0.1:3000
+```
+
+**Important**: Always use `127.0.0.1` instead of `localhost` to avoid connection issues.
+
+### Step 5: Set Up Canva
+1. Visit [Canva Developers](https://www.canva.com/developers)
+2. Create a new app
+3. Add this redirect URI: `http://127.0.0.1:3000/api/auth/callback/canva`
+4. Copy your Client ID and Secret to `.env.local`
+
+### Step 6: Start the App
+```bash
+npm run dev
+```
+
+Open `http://127.0.0.1:3000` in your browser.
+
+## 🔑 Getting Started (For Users)
+
+Once you've logged in, you'll need to connect your accounts. Go to Settings and add:
+
+### 1. OpenAI API Key
+- Get it from [OpenAI Platform](https://platform.openai.com/api-keys)
+- Powers the AI agents that create your content
+
+### 2. Canva Account
+- Click "Connect Canva" to link your account
+- This lets you use your Canva designs
+
+### 3. Notion API Token
+- Get it from [Notion Integrations](https://www.notion.so/my-integrations)
+- Creates a database to track your campaigns
+
+### 4. GitHub Personal Access Token
+- Create one at [GitHub Settings](https://github.com/settings/tokens)
+- Needed to publish landing pages
+- Select permissions: `repo` and `workflow`
+
+### 5. Mailchimp API Key
+- Find it at [Mailchimp Account](https://admin.mailchimp.com/account/api/)
+- Also need your server prefix (e.g., us21)
+- Sends your email campaigns
+
+## 🤖 Meet Your AI Team
+
+Marketing Automator uses four specialized AI agents that work together to create your campaigns:
+
+### Brand Agent
+Handles the visual side of things - picks colors that work well together, suggests fonts, and ensures everything looks consistent with your brand.
+
+### Content Agent
+Your copywriter - creates headlines, writes compelling descriptions, and crafts calls-to-action that convert. It adapts the tone and style based on your campaign goals.
+
+### Technical Agent
+The builder - takes the design and content and turns them into actual emails and web pages. Handles all the HTML, CSS, and makes sure everything displays correctly.
+
+### Orchestrator Agent
+The project manager - coordinates the other agents, reviews their work, and suggests improvements. Makes sure everything works together seamlessly.
+
+## 🏗️ How Our Code is Organized
+
+Understanding our project structure helps you navigate and contribute:
+
+### `/app/api`
+Contains all the backend logic:
+- Integration endpoints (Canva, Notion, GitHub, Mailchimp)
+- AI agent orchestration
+- Campaign management APIs
+
+### `/app/components`
+Reusable UI elements:
+- Forms, buttons, cards
+- Dashboard widgets
+- Settings panels
+
+### `/app/services`
+Business logic layer:
+- AI agent implementations
+- Integration service classes
+- Data processing utilities
+
+### `/app/campaigns`
+Campaign management interface:
+- Creation wizard
+- Analytics dashboard
+- Campaign list and details
+
+### `/app/dashboard`
+Main dashboard:
+- Canva design browser
+- Quick actions
+- Overview statistics
+
+### `/supabase`
+Database layer:
+- Table schemas
+- Row Level Security policies
+- Encrypted API key storage
+
+## 📊 Creating Your First Campaign
+
+1. **Go to Dashboard** - See all your Canva designs organized by type
+2. **Pick a Design** - Click "Distribute Campaign" on any design
+3. **Describe Your Goal** - Tell the AI what you want to achieve
+4. **Choose Format** - Email, landing page, Notion Database
+5. **Review & Customize** - Edit the AI-generated content if needed
+6. **Launch** - Send emails and publish landing pages with one click
+
+---

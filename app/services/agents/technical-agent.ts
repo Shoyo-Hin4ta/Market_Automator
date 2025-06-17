@@ -39,21 +39,32 @@ export class TechnicalAgent extends BaseAgent {
     contentStrategy: ContentStrategy,
     designUrl?: string
   ): Promise<string> {
-    const prompt = `Create a responsive email template:
+    const prompt = `Create a responsive email template for "${formData.product}":
+    
+    CRITICAL CONTEXT:
+    - Product: "${formData.product}"
+    - Audience: "${formData.audience}"
+    - Purpose: "${formData.purpose}"
     
     Design System:
     ${JSON.stringify(brandSystem, null, 2)}
     
-    Content:
+    Content Strategy (USE THESE EXACT HEADLINES AND COPY):
     ${JSON.stringify(contentStrategy, null, 2)}
     
     Requirements:
     - Mobile-responsive table-based layout
     - Inline CSS for email compatibility
     - Include design image: ${designUrl || 'use placeholder'}
-    - ${formData.ctaEnabled ? `CTA button linking to: ${formData.ctaLink}` : 'No CTA'}
+    - ${formData.ctaEnabled ? `CTA button with text "${formData.ctaText}" linking to: ${formData.ctaLink}` : 'No CTA'}
     - Support for all major email clients
     - Use the exact hex colors provided in the brand system
+    
+    CONTENT RULES:
+    - Use the EXACT headlines from contentStrategy
+    - Include ALL value propositions and benefits from contentStrategy
+    - Never use generic placeholders - use the actual product name "${formData.product}"
+    - Email should clearly be about "${formData.product}" for "${formData.audience}"
     
     IMPORTANT: Return ONLY the HTML code. Do not include any explanations, markdown code blocks, or commentary. Start your response with <!DOCTYPE html> or <html>.`;
     
@@ -67,12 +78,17 @@ export class TechnicalAgent extends BaseAgent {
     contentStrategy: ContentStrategy,
     designUrl?: string
   ): Promise<string> {
-    const prompt = `Create a modern landing page:
+    const prompt = `Create a modern landing page for "${formData.product}":
+    
+    CRITICAL CONTEXT:
+    - Product: "${formData.product}"
+    - Audience: "${formData.audience}"
+    - Purpose: "${formData.purpose}"
     
     Design System:
     ${JSON.stringify(brandSystem, null, 2)}
     
-    Content:
+    Content Strategy (USE THESE EXACT HEADLINES AND COPY):
     ${JSON.stringify(contentStrategy, null, 2)}
     
     Requirements:
@@ -81,10 +97,19 @@ export class TechnicalAgent extends BaseAgent {
     - Include smooth animations
     - Mobile-first responsive design
     - Hero section with design image: ${designUrl || 'use placeholder'}
-    - ${formData.ctaEnabled ? `Multiple CTA buttons linking to: ${formData.ctaLink}` : 'No CTA'}
+    - ${formData.ctaEnabled ? `Multiple CTA buttons with text "${formData.ctaText}" linking to: ${formData.ctaLink}` : 'No CTA'}
     - Modern, accessible, performant
     - Theme: ${formData.theme} visual style
     - Use the exact hex colors provided in the brand system
+    
+    CONTENT RULES:
+    - Hero headline MUST be the primary headline from contentStrategy
+    - Subheadline MUST be the secondary headline from contentStrategy
+    - Feature sections MUST use the value propositions from contentStrategy
+    - Benefits section MUST use the benefits from contentStrategy
+    - Never use generic placeholders - always mention "${formData.product}" specifically
+    - Content should clearly explain what "${formData.product}" does for "${formData.audience}"
+    - Focus on achieving: "${formData.purpose}"
     
     IMPORTANT: Return ONLY the HTML code. Do not include any explanations, markdown code blocks, or commentary. Start your response with <!DOCTYPE html>.`;
     
