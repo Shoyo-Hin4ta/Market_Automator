@@ -56,6 +56,7 @@ export class TechnicalAgent extends BaseAgent {
     - Mobile-responsive table-based layout
     - Inline CSS for email compatibility
     - Include design image: ${designUrl || 'use placeholder'}
+    - IMPORTANT: Center the design image in the hero section with proper spacing
     - ${formData.ctaEnabled ? `CTA button with text "${formData.ctaText}" linking to: ${formData.ctaLink}` : 'No CTA'}
     - Support for all major email clients
     - Use the exact hex colors provided in the brand system
@@ -97,6 +98,7 @@ export class TechnicalAgent extends BaseAgent {
     - Include smooth animations
     - Mobile-first responsive design
     - Hero section with design image: ${designUrl || 'use placeholder'}
+    - IMPORTANT: Center the design image in the hero section (use mx-auto and proper container)
     - ${formData.ctaEnabled ? `Multiple CTA buttons with text "${formData.ctaText}" linking to: ${formData.ctaLink}` : 'No CTA'}
     - Modern, accessible, performant
     - Theme: ${formData.theme} visual style
@@ -136,5 +138,76 @@ export class TechnicalAgent extends BaseAgent {
     
     const html = await this.generateText(prompt);
     return this.cleanHtmlOutput(html);
+  }
+  
+  async refineWithContext(params: {
+    currentEmail?: string
+    currentLanding?: string
+    instructions: string
+    brandSystem: BrandSystem
+    contentStrategy: ContentStrategy
+    context: any
+    target?: 'email' | 'landing' | 'both'
+  }): Promise<{ email?: string; landing?: string }> {
+    const result: { email?: string; landing?: string } = {};
+    const target = params.target || 'both';
+    
+    // Only update email if target includes it
+    if (params.currentEmail && (target === 'email' || target === 'both')) {
+      const prompt = `Update this email HTML based on the user's request.
+      
+      User Request: ${params.instructions}
+      
+      Current HTML:
+      ${params.currentEmail}
+      
+      Updated Brand System (use these colors/fonts):
+      ${JSON.stringify(params.brandSystem, null, 2)}
+      
+      Updated Content (use these headlines/text):
+      ${JSON.stringify(params.contentStrategy, null, 2)}
+      
+      Context:
+      - Product: "${params.context.formData?.product || ''}"
+      - Design Image URL: "${params.context.designUrl || ''}"
+      
+      Apply ALL changes requested by the user. Return ONLY the updated HTML code.`;
+      
+      const html = await this.generateText(prompt);
+      result.email = this.cleanHtmlOutput(html);
+    } else if (params.currentEmail && target !== 'email') {
+      // Keep the original email if not targeted
+      result.email = params.currentEmail;
+    }
+    
+    // Only update landing if target includes it
+    if (params.currentLanding && (target === 'landing' || target === 'both')) {
+      const prompt = `Update this landing page HTML based on the user's request.
+      
+      User Request: ${params.instructions}
+      
+      Current HTML:
+      ${params.currentLanding}
+      
+      Updated Brand System (use these colors/fonts):
+      ${JSON.stringify(params.brandSystem, null, 2)}
+      
+      Updated Content (use these headlines/text):
+      ${JSON.stringify(params.contentStrategy, null, 2)}
+      
+      Context:
+      - Product: "${params.context.formData?.product || ''}"
+      - Design Image URL: "${params.context.designUrl || ''}"
+      
+      Apply ALL changes requested by the user. Return ONLY the updated HTML code.`;
+      
+      const html = await this.generateText(prompt);
+      result.landing = this.cleanHtmlOutput(html);
+    } else if (params.currentLanding && target !== 'landing') {
+      // Keep the original landing if not targeted
+      result.landing = params.currentLanding;
+    }
+    
+    return result;
   }
 }

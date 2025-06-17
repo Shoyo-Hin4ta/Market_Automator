@@ -78,17 +78,22 @@ export class BrandAgent extends BaseAgent {
   
   async refineBrandSystem(
     currentSystem: BrandSystem,
-    refinementRequest: string
+    refinementRequest: string,
+    context?: any
   ): Promise<BrandSystem> {
-    const prompt = `Refine this brand system based on the request:
+    const prompt = `Update this brand system based on the user's request.
     
-    Current System:
+    Current Brand System:
     ${JSON.stringify(currentSystem, null, 2)}
     
-    Refinement Request: ${refinementRequest}
+    User Request: ${refinementRequest}
     
-    IMPORTANT: Keep the exact same color values unless specifically asked to change them.
-    Focus on refining typography, spacing, or visual style elements.`;
+    ${context ? `Campaign Context:
+    - Product: ${context.formData?.product}
+    - Audience: ${context.formData?.audience}
+    - Theme: ${context.formData?.theme}` : ''}
+    
+    Apply the changes requested by the user and return the complete updated BrandSystem object.`;
     
     return this.generateStructured(prompt, BrandSystemSchema);
   }

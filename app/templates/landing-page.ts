@@ -22,6 +22,17 @@ export function generateLandingPage(campaign: {
             background-color: #f9fafb;
             color: #1f2937;
             line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Hide scrollbars but keep functionality */
+        html {
+            overflow-x: hidden;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        html::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
         
         .container {
@@ -137,6 +148,16 @@ export function generateLandingPageHTML(data: {
       line-height: 1.6;
       color: #333;
       background: #f5f5f5;
+      overflow-x: hidden;
+    }
+    /* Hide scrollbars but keep functionality */
+    html {
+      overflow-x: hidden;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE and Edge */
+    }
+    html::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
     }
     .hero {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

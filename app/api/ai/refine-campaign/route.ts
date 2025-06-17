@@ -35,7 +35,8 @@ export async function POST(request: NextRequest) {
       themeStyle,
       aiDecideColors = false,
       colorMode,
-      colorThemeDescription
+      colorThemeDescription,
+      previousOutputs
     } = await request.json()
     
     const aiService = new MultiAgentCampaignService(apiKeyData.encrypted_key)
@@ -47,17 +48,91 @@ export async function POST(request: NextRequest) {
     const isRefinement = currentEmail || currentLanding
     
     if (isRefinement) {
-      // Refine existing content
+      // Parse form data from previous outputs or messages
+      let formData = null;
+      
+      // If we have previousOutputs with the form data, use it
+      if (previousOutputs?.formData) {
+        formData = previousOutputs.formData;
+        // Ensure selectedColors is properly set
+        if (!formData.selectedColors && selectedColors) {
+          formData.selectedColors = selectedColors;
+        }
+      } else {
+        // Otherwise extract from messages (fallback)
+        formData = {
+          product: '', 
+          audience: '', 
+          purpose: '', 
+          tone: 'professional',
+          theme: themeStyle || 'modern',
+          ctaEnabled: true,
+          ctaText: 'Get Started',
+          ctaLink: '#',
+          selectedColors: selectedColors || null,
+        };
+        
+        // Extract from first message if available
+        const firstMessage = messages[0]?.content || latestMessage;
+        const lines = firstMessage.split('\n').map(line => line.trim());
+        
+        const productLine = lines.find(line => line.startsWith('I want to create a campaign for'));
+        if (productLine) {
+          formData.product = productLine.replace('I want to create a campaign for ', '').replace(/\.$/, '').trim();
+        }
+        
+        const audienceLine = lines.find(line => line.startsWith('My target audience is'));
+        if (audienceLine) {
+          formData.audience = audienceLine.replace('My target audience is ', '').replace(/\.$/, '').trim();
+        }
+        
+        const purposeLine = lines.find(line => line.startsWith('The purpose of this campaign is'));
+        if (purposeLine) {
+          formData.purpose = purposeLine.replace('The purpose of this campaign is ', '').replace(/\.$/, '').trim();
+        }
+        
+        // Extract tone and theme
+        const toneThemeLine = lines.find(line => line.includes('tone with a') && line.includes('theme'));
+        if (toneThemeLine) {
+          const toneMatch = toneThemeLine.match(/I want a (\w+) tone/);
+          const themeMatch = toneThemeLine.match(/with a (\w+) theme/);
+          if (toneMatch) formData.tone = toneMatch[1];
+          if (themeMatch) formData.theme = themeMatch[1];
+        }
+        
+        // Extract CTA info
+        const ctaLine = lines.find(line => line.includes('Include a CTA button') || line.includes('No CTA buttons'));
+        if (ctaLine) {
+          if (ctaLine.includes('No CTA buttons')) {
+            formData.ctaEnabled = false;
+          } else {
+            const ctaMatch = ctaLine.match(/Include a CTA button "(.+?)" linking to (.+)$/);
+            if (ctaMatch) {
+              formData.ctaText = ctaMatch[1];
+              formData.ctaLink = ctaMatch[2];
+            }
+          }
+        }
+      }
+      
+      // Log for debugging
+      console.log('Refinement context - formData:', formData);
+      
+      // Refine existing content with full context
       const result = await aiService.refineContent(
         {
           currentEmail,
           currentLanding,
           agentContext: {
-            formData: { selectedColors, themeStyle },
+            formData,
             campaignName,
             designUrl,
             selectedChannels,
           },
+          previousOutputs: {
+            ...previousOutputs,
+            formData // Ensure formData is included
+          }
         },
         latestMessage
       );
@@ -66,7 +141,10 @@ export async function POST(request: NextRequest) {
         email: result.email,
         landing: result.landing,
         message: result.message,
-        context: null
+        context: {
+          ...result.metadata,
+          formData // Include formData in response for next refinement
+        }
       })
     }
     
@@ -181,7 +259,10 @@ export async function POST(request: NextRequest) {
       email: result.email,
       landing: result.landing,
       message: result.message,
-      context: result.context,
+      context: {
+        ...result.context,
+        formData  // Include formData in context for frontend storage
+      },
       generatedColors: (colorMode === 'ai' || colorMode === 'describe') ? formData.selectedColors : null
     })
     

@@ -70,21 +70,23 @@ export class ContentAgent extends BaseAgent {
   async refineContent(
     currentStrategy: ContentStrategy,
     refinementRequest: string,
-    context: CampaignFormData
+    context: any,
+    brandSystem?: BrandSystem
   ): Promise<ContentStrategy> {
-    const prompt = `Refine this content strategy:
+    const prompt = `Update this content strategy based on the user's request.
     
-    Current Strategy:
+    Current Content Strategy:
     ${JSON.stringify(currentStrategy, null, 2)}
     
-    Refinement Request: ${refinementRequest}
+    User Request: ${refinementRequest}
     
-    Context:
-    - Product: ${context.product}
-    - Audience: ${context.audience}
-    - Tone: ${context.tone}
+    Campaign Context:
+    - Product: ${context.formData?.product || context.product}
+    - Audience: ${context.formData?.audience || context.audience}
+    - Purpose: ${context.formData?.purpose || context.purpose}
+    - Tone: ${context.formData?.tone || context.tone}
     
-    Maintain message consistency while addressing the specific request.`;
+    Apply the changes requested by the user and return the complete updated ContentStrategy object.`;
     
     return this.generateStructured(prompt, ContentStrategySchema);
   }

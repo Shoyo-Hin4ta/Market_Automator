@@ -95,4 +95,23 @@ export interface RefinementRequest {
   currentLanding?: string
   userRequest: string
   context: AgentContext
+  previousOutputs?: {
+    brandSystem?: BrandSystem
+    contentStrategy?: ContentStrategy
+    technicalImplementation?: {
+      emailHtml?: string
+      landingHtml?: string
+    }
+  }
+}
+
+export interface RefinementRouting {
+  agents: Array<{
+    name: 'brand' | 'content' | 'technical' | 'all'
+    instructions: string
+    priority: number
+    target?: 'email' | 'landing' | 'both'
+  }>
+  refinementType: string
+  reasoning: string
 }

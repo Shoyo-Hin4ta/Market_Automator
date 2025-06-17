@@ -159,45 +159,90 @@ export class OrchestratorAgent extends BaseAgent {
   }
   
   async handleRefinement(request: RefinementRequest): Promise<GeneratedContent> {
-    // Determine which agent should handle the refinement
     const routing = await this.routeRefinement(request);
     
-    let updatedBrandSystem: BrandSystem | undefined;
-    let updatedContentStrategy: ContentStrategy | undefined;
+    let updatedBrandSystem = request.previousOutputs?.brandSystem;
+    let updatedContentStrategy = request.previousOutputs?.contentStrategy;
     let updatedEmail = request.currentEmail || '';
     let updatedLanding = request.currentLanding || '';
+    let needsHtmlRegeneration = false;
     
-    // Execute refinements based on routing
-    switch (routing.targetAgent) {
-      case 'brand':
-        // For brand refinements, we need to get current brand system from metadata
-        // This would need to be passed in the request context
-        break;
-        
-      case 'content':
-        // For content refinements, we need current content strategy from metadata
-        break;
-        
-      case 'technical':
-        if (request.currentEmail) {
-          updatedEmail = await this.technicalAgent.refineImplementation(
-            request.currentEmail,
-            routing.specificInstructions,
-            true
-          );
-        }
-        if (request.currentLanding) {
-          updatedLanding = await this.technicalAgent.refineImplementation(
-            request.currentLanding,
-            routing.specificInstructions,
-            false
-          );
-        }
-        break;
-        
-      case 'all':
-        // Complete regeneration with specific focus
-        return this.coordinateGeneration(request.context);
+    // Execute refinements for each agent in priority order
+    for (const agentTask of routing.agents.sort((a, b) => a.priority - b.priority)) {
+      switch (agentTask.name) {
+        case 'brand':
+          if (updatedBrandSystem) {
+            updatedBrandSystem = await this.brandAgent.refineBrandSystem(
+              updatedBrandSystem,
+              agentTask.instructions,
+              request.context
+            );
+            needsHtmlRegeneration = true; // Brand changes require HTML update
+          }
+          break;
+          
+        case 'content':
+          if (updatedContentStrategy) {
+            updatedContentStrategy = await this.contentAgent.refineContent(
+              updatedContentStrategy,
+              agentTask.instructions,
+              request.context,
+              updatedBrandSystem
+            );
+            needsHtmlRegeneration = true; // Content changes require HTML update
+          }
+          break;
+          
+        case 'technical':
+          // Technical agent handles its own HTML updates
+          if (updatedBrandSystem && updatedContentStrategy) {
+            const technicalUpdate = await this.technicalAgent.refineWithContext({
+              currentEmail: updatedEmail,
+              currentLanding: updatedLanding,
+              instructions: agentTask.instructions,
+              brandSystem: updatedBrandSystem,
+              contentStrategy: updatedContentStrategy,
+              context: request.context,
+              target: agentTask.target || 'both'
+            });
+            if (technicalUpdate.email) updatedEmail = technicalUpdate.email;
+            if (technicalUpdate.landing) updatedLanding = technicalUpdate.landing;
+            needsHtmlRegeneration = false; // Already handled
+          }
+          break;
+          
+        case 'all':
+          // Complete regeneration with new instructions
+          return this.coordinateGeneration({
+            ...request.context,
+            refinementInstructions: agentTask.instructions
+          } as AgentContext);
+      }
+    }
+    
+    // If brand or content was updated but technical wasn't called, regenerate HTML
+    if (needsHtmlRegeneration && updatedBrandSystem && updatedContentStrategy) {
+      console.log('🔧 Regenerating HTML with updated brand/content...');
+      
+      // Detect target from the routing agents
+      let regenerationTarget: 'email' | 'landing' | 'both' = 'both';
+      const brandOrContentAgent = routing.agents.find(a => a.name === 'brand' || a.name === 'content');
+      if (brandOrContentAgent?.target) {
+        regenerationTarget = brandOrContentAgent.target;
+      }
+      
+      const technicalUpdate = await this.technicalAgent.refineWithContext({
+        currentEmail: updatedEmail,
+        currentLanding: updatedLanding,
+        instructions: request.userRequest, // Pass the original user request
+        brandSystem: updatedBrandSystem,
+        contentStrategy: updatedContentStrategy,
+        context: request.context,
+        target: regenerationTarget
+      });
+      
+      if (technicalUpdate.email) updatedEmail = technicalUpdate.email;
+      if (technicalUpdate.landing) updatedLanding = technicalUpdate.landing;
     }
     
     return {
@@ -208,29 +253,147 @@ export class OrchestratorAgent extends BaseAgent {
         contentStrategy: updatedContentStrategy || ({} as ContentStrategy),
         agentInsights: {
           refinementType: routing.refinementType,
-          targetAgent: routing.targetAgent,
+          reasoning: routing.reasoning,
+          agentsInvolved: routing.agents.map(a => a.name)
         },
-        suggestedRefinements: [],
-      },
+        suggestedRefinements: []
+      }
     };
   }
   
-  private async routeRefinement(request: RefinementRequest): Promise<any> {
-    const prompt = `Route this refinement request to the appropriate agent:
-    
+  private async routeRefinement(request: RefinementRequest): Promise<RefinementRouting> {
+    const prompt = `You are an expert at understanding user feedback and routing it to the appropriate specialized agents. Analyze this request carefully and determine EXACTLY what the user wants changed.
+
     User Request: "${request.userRequest}"
     
-    Context:
+    Current Campaign Context:
+    - Product: ${request.context.formData?.product || 'Not specified'}
+    - Audience: ${request.context.formData?.audience || 'Not specified'}
+    - Purpose: ${request.context.formData?.purpose || 'Not specified'}
+    - Tone: ${request.context.formData?.tone || 'Not specified'}
+    - Theme: ${request.context.formData?.theme || 'Not specified'}
     - Has current email: ${!!request.currentEmail}
     - Has current landing: ${!!request.currentLanding}
-    - Product: ${request.context.formData.product}
     
-    Determine:
-    1. Target agent: brand (visual style/typography), content (copy/messaging), technical (HTML/layout), or all (complete redo)
-    2. Refinement type: what aspect is being refined
-    3. Specific instructions for the target agent
+    Current Brand System:
+    ${request.previousOutputs?.brandSystem ? `
+    - Colors: Primary=${request.previousOutputs.brandSystem?.colors?.primary || 'not set'}, Secondary=${request.previousOutputs.brandSystem?.colors?.secondary || 'not set'}, Text=${request.previousOutputs.brandSystem?.colors?.text || 'not set'}
+    - Typography: Heading=${request.previousOutputs.brandSystem?.typography?.headingFont || 'not set'}, Body=${request.previousOutputs.brandSystem?.typography?.bodyFont || 'not set'}
+    - Visual Style: ${request.previousOutputs.brandSystem?.visualStyle?.layoutStyle || 'not set'}
+    ` : 'Not yet generated'}
     
-    Note: Colors are user-selected and should not be changed unless explicitly requested.`;
+    Current Content Strategy:
+    ${request.previousOutputs?.contentStrategy ? `
+    - Primary Headline: "${request.previousOutputs.contentStrategy?.headlines?.primary || 'not set'}"
+    - Secondary Headline: "${request.previousOutputs.contentStrategy?.headlines?.secondary || 'not set'}"
+    - Key Benefits: ${request.previousOutputs.contentStrategy?.body?.benefits?.join(', ') || 'not set'}
+    - CTA: "${request.previousOutputs.contentStrategy?.cta?.primary || 'not set'}"
+    ` : 'Not yet generated'}
+    
+    IMPORTANT ROUTING RULES:
+    
+    1. **BRAND AGENT** handles:
+       - Color changes: "darker", "brighter", "more blue", "warmer", "cooler", specific hex codes
+       - Font changes: "bigger", "smaller", "different font", "more readable", "bolder"
+       - Spacing: "more space", "tighter", "breathing room", "cramped", "padding"
+       - Visual style: "modern", "classic", "minimalist", "fancy", "simple"
+       - Overall look: "professional", "playful", "serious", "fun", "corporate"
+    
+    2. **CONTENT AGENT** handles:
+       - Headlines: "catchier", "shorter", "longer", "more exciting", "clearer"
+       - Body text: "simpler", "more detail", "benefits", "features", "persuasive"
+       - Tone: "friendlier", "formal", "casual", "urgent", "relaxed"
+       - Messaging: "clearer value prop", "stronger CTA", "more emotional"
+       - Specific text changes: "change X to Y", "add mention of Z"
+    
+    3. **TECHNICAL AGENT** handles:
+       - Layout: "center the image", "left align", "right align", "move up/down"
+       - Structure: "add section", "remove section", "reorder", "columns", "rows"
+       - Image/Design placement: "bigger image", "smaller", "background", "hero section"
+       - Responsiveness: "mobile friendly", "desktop optimized", "tablet view"
+       - HTML structure: "add testimonials", "add FAQ", "add pricing table"
+    
+    4. **MULTIPLE AGENTS** for complex requests:
+       - "Make it look like Apple" → brand (minimal colors), content (simple copy), technical (clean layout)
+       - "Too corporate" → brand (warmer colors), content (friendlier tone), technical (less rigid layout)
+       - "Doesn't pop" → brand (bolder colors), content (stronger headlines), technical (dynamic layout)
+       - "Feels cheap" → brand (premium colors), content (sophisticated copy), technical (elegant structure)
+    
+    COMPREHENSIVE EXAMPLES:
+    
+    Visual/Design Requests:
+    - "center the canva design" → technical: "Center the main design image in both email hero section and landing page hero"
+    - "make the image bigger" → technical: "Increase the Canva design image size to be more prominent (at least 600px wide)"
+    - "design should be on the left" → technical: "Move Canva design to left side with text on the right in a two-column layout"
+    - "use the design as background" → technical: "Set Canva design as background image with overlay for text readability"
+    - "less space around the image" → technical: "Reduce padding around the Canva design image from current spacing to 20px"
+    
+    Color/Style Requests:
+    - "too bright" → brand: "Reduce color brightness by 20%, use more muted tones"
+    - "needs more contrast" → brand: "Increase contrast between text (${request.previousOutputs?.brandSystem?.colors?.text}) and background"
+    - "warmer feel" → brand: "Shift color palette towards warmer tones (reds, oranges, yellows)"
+    - "more premium look" → brand: "Use darker, richer colors with gold accents, increase spacing"
+    
+    Content/Copy Requests:
+    - "headline is boring" → content: "Make headline '${request.previousOutputs?.contentStrategy?.headlines?.primary}' more exciting and benefit-focused"
+    - "too salesy" → content: "Reduce promotional language, focus on value and helping the customer"
+    - "add urgency" → content: "Add time-sensitive language and scarcity elements to drive action"
+    - "mention the price" → content: "Include pricing information prominently in the value proposition"
+    
+    Layout/Structure Requests:
+    - "too cluttered" → technical: "Simplify layout with more whitespace, clearer sections"
+    - "add testimonials" → technical: "Add a testimonials section with 3 customer quotes"
+    - "mobile doesn't look good" → technical: "Optimize layout for mobile with single column and larger touch targets"
+    - "want a video section" → technical: "Add video embed section below the hero area"
+    
+    Vague but Common Requests:
+    - "doesn't feel right" → all: "Regenerate with better alignment to ${request.context.formData?.purpose}"
+    - "make it pop" → brand: "Use bolder colors and stronger contrasts", content: "Use power words", technical: "Add visual hierarchy"
+    - "too generic" → content: "Make copy specific to ${request.context.formData?.product}", brand: "Use unique color scheme"
+    - "looks dated" → brand: "Modernize with current design trends", technical: "Update to contemporary layout patterns"
+    
+    TARGET DETECTION RULES:
+    
+    Determine if the user wants to change ONLY email, ONLY landing page, or BOTH:
+    
+    EMAIL ONLY indicators:
+    - "email background", "email header", "email footer"
+    - "in the email", "for the email", "email version"
+    - "email template", "email design", "email layout"
+    - "subject line" (always email only)
+    
+    LANDING PAGE ONLY indicators:
+    - "landing page background", "landing page header", "LP"
+    - "on the landing page", "for the landing page", "landing version"
+    - "hero section" (usually landing page unless specified)
+    - "website", "web page", "site"
+    
+    BOTH (default) indicators:
+    - No specific mention of email or landing
+    - "all", "everything", "both"
+    - "the campaign", "the design", "the content"
+    - General requests like "make it blue", "change the font"
+    
+    CRITICAL: 
+    - Always provide SPECIFIC, ACTIONABLE instructions
+    - Reference current values when asking for changes
+    - If request is vague, make educated decisions based on campaign context
+    - For positioning requests (center, left, right, etc), ALWAYS route to technical agent
+    - For "design" mentions, determine if they mean the Canva image (technical) or overall design (brand)
+    - ALWAYS specify target ('email', 'landing', or 'both') for each agent task
+    
+    Return your analysis with clear routing and instructions for each agent.`;
+    
+    const RefinementRoutingSchema = z.object({
+      agents: z.array(z.object({
+        name: z.enum(['brand', 'content', 'technical', 'all']),
+        instructions: z.string(),
+        priority: z.number(),
+        target: z.enum(['email', 'landing', 'both']).optional()
+      })),
+      refinementType: z.string(),
+      reasoning: z.string()
+    });
     
     return this.generateStructured(prompt, RefinementRoutingSchema);
   }

@@ -112,6 +112,7 @@ export default function CustomizeCampaignPage() {
   const [landingContent, setLandingContent] = useState<string>('')
   const [activeTab, setActiveTab] = useState('email')
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false)
+  const [agentMetadata, setAgentMetadata] = useState<any>(null)
   const [isCreatingCampaign, setIsCreatingCampaign] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
@@ -209,6 +210,19 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
       if (data.landing) setLandingContent(data.landing)
       setHasGeneratedContent(true)
       
+      // Store agent metadata and form data
+      if (data.context?.metadata) {
+        setAgentMetadata(data.context.metadata)
+      }
+      // Store form data if returned (for refinement context)
+      if (data.context?.formData) {
+        setFormData(prev => ({
+          ...prev,
+          ...data.context.formData,
+          selectedColors: data.context.formData.selectedColors || prev.selectedColors
+        }))
+      }
+      
       // Update colors if AI generated them
       if (data.generatedColors) {
         setFormData(prev => ({
@@ -260,7 +274,16 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
           messages: [...messages, { role: 'user', content: userMessage }],
           currentEmail: emailContent,
           currentLanding: landingContent,
-          selectedChannels
+          selectedChannels,
+          previousOutputs: agentMetadata ? {
+            brandSystem: agentMetadata.brandSystem,
+            contentStrategy: agentMetadata.contentStrategy,
+            formData: formData,
+            technicalImplementation: {
+              emailHtml: emailContent,
+              landingHtml: landingContent
+            }
+          } : undefined
         })
       })
       
@@ -270,6 +293,11 @@ ${formData.ctaEnabled ? `Include a CTA button "${formData.ctaText}" linking to $
       
       if (data.email) setEmailContent(data.email)
       if (data.landing) setLandingContent(data.landing)
+      
+      // Update agent metadata if returned
+      if (data.context?.metadata) {
+        setAgentMetadata(data.context.metadata)
+      }
       
       setMessages(prev => [...prev, { 
         role: 'assistant', 

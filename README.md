@@ -106,19 +106,24 @@ Once you've logged in, you'll need to connect your accounts. Go to Settings and 
 
 ## 🤖 Meet Your AI Team
 
-Marketing Automator uses four specialized AI agents that work together to create your campaigns:
+Marketing Automator uses a multi-agent system to create your campaigns:
 
-### Brand Agent
-Handles the visual side of things - picks colors that work well together, suggests fonts, and ensures everything looks consistent with your brand.
+### Initial Campaign Creation
+When you create a new campaign, four specialized agents work together:
 
-### Content Agent
-Your copywriter - creates headlines, writes compelling descriptions, and crafts calls-to-action that convert. It adapts the tone and style based on your campaign goals.
+**Orchestrator Agent** - The project manager that coordinates the team and ensures everything works together seamlessly.
 
-### Technical Agent
-The builder - takes the design and content and turns them into actual emails and web pages. Handles all the HTML, CSS, and makes sure everything displays correctly.
+**Brand Agent** - Handles colors, fonts, spacing, and visual consistency. Creates a cohesive design system for your campaign.
 
-### Orchestrator Agent
-The project manager - coordinates the other agents, reviews their work, and suggests improvements. Makes sure everything works together seamlessly.
+**Content Agent** - Your copywriter that creates headlines, body text, and calls-to-action. Adapts tone and messaging to your audience.
+
+**Technical Agent** - Builds the actual HTML for emails and landing pages, ensuring everything displays correctly across devices.
+
+### Campaign Refinement
+When you want to make changes, a single **Refinement Agent** handles all updates:
+- Understands natural language requests like "make the heading white" or "change the website background"
+- Directly modifies the HTML without complex routing
+- Automatically detects whether to update email, landing page, or both
 
 ## 🏗️ How Our Code is Organized
 
@@ -138,8 +143,9 @@ Reusable UI elements:
 
 ### `/app/services`
 Business logic layer:
-- AI agent implementations
-- Integration service classes
+- `/agents` - AI agent implementations (orchestrator, brand, content, technical, refinement)
+- `/multi-agent-campaign.ts` - Main service coordinating the AI system
+- Integration service classes (Notion, GitHub, Mailchimp)
 - Data processing utilities
 
 ### `/app/campaigns`
@@ -170,3 +176,4 @@ Database layer:
 6. **Launch** - Send emails and publish landing pages with one click
 
 ---
+

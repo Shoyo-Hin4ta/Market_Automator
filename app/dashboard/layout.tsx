@@ -15,7 +15,7 @@ export default function DashboardLayout({
   const { signOut } = useAuth()
   
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0827 30%, #0f0517 70%, #0a0a0a 100%)' }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0827 30%, #0f0517 70%, #0a0a0a 100%)' }}>
       <header className="border-b backdrop-blur-sm" style={{ backgroundColor: 'rgba(10, 10, 10, 0.7)', borderColor: 'rgba(251, 191, 36, 0.1)' }}>
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
