@@ -177,3 +177,8 @@ Database layer:
 
 ---
 
+Check this Video Out to see complete flow
+
+[![Marketing Automator Demo](https://img.youtube.com/vi/iH4Jmi1dvc0/0.jpg)](https://www.youtube.com/watch?v=iH4Jmi1dvc0)
+
+---
